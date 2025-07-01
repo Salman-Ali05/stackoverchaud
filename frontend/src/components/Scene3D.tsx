@@ -1,0 +1,111 @@
+import React from 'react';
+import { Canvas } from '@react-three/fiber';
+import { OrbitControls, Environment, ContactShadows } from '@react-three/drei';
+import { Classroom } from './Classroom';
+import { ClassroomData } from '../types/classroom';
+
+interface Scene3DProps {
+  classrooms: ClassroomData[];
+  onToggleClassroom: (id: string) => void;
+}
+
+export const Scene3D: React.FC<Scene3DProps> = ({ classrooms, onToggleClassroom }) => {
+  return (
+    <div className="w-full h-[500px] bg-gradient-to-br from-slate-900 to-slate-800 rounded-xl overflow-hidden shadow-2xl">
+      <Canvas
+        camera={{ position: [12, 8, 12], fov: 60 }}
+        shadows="soft"
+        gl={{ 
+          antialias: true,
+          shadowMapType: 2, // PCFSoftShadowMap
+        }}
+      >
+        {/* Éclairage optimisé pour éviter les ombres flashy */}
+        <ambientLight intensity={0.5} />
+        <directionalLight
+          position={[10, 12, 8]}
+          intensity={0.8}
+          castShadow
+          shadow-mapSize={[1024, 1024]}
+          shadow-camera-far={30}
+          shadow-camera-left={-12}
+          shadow-camera-right={12}
+          shadow-camera-top={12}
+          shadow-camera-bottom={-12}
+          shadow-bias={-0.0001}
+          shadow-normalBias={0.02}
+        />
+        
+        {/* Éclairage d'appoint sans ombres pour éviter les conflits */}
+        <pointLight 
+          position={[0, 8, 0]} 
+          intensity={0.3} 
+          color="#FFFFFF"
+          castShadow={false}
+        />
+        <pointLight 
+          position={[-8, 4, 0]} 
+          intensity={0.2} 
+          color="#3B82F6"
+          castShadow={false}
+        />
+        <pointLight 
+          position={[8, 4, 0]} 
+          intensity={0.2} 
+          color="#8B5CF6"
+          castShadow={false}
+        />
+
+        {/* Environnement avec intensité réduite */}
+        <Environment preset="city" environmentIntensity={0.3} />
+        
+        {/* Sol principal avec ombres de contact optimisées */}
+        <ContactShadows
+          position={[0, -0.1, 0]}
+          opacity={0.25}
+          scale={30}
+          blur={1.5}
+          far={4}
+          resolution={512}
+          color="#000000"
+        />
+
+        {/* Sol de base */}
+        <mesh position={[0, -0.2, 0]} receiveShadow>
+          <boxGeometry args={[25, 0.2, 15]} />
+          <meshStandardMaterial 
+            color="#E2E8F0" 
+            roughness={0.9}
+            metalness={0.05}
+          />
+        </mesh>
+
+        {/* Salles de classe */}
+        {classrooms.map((classroom) => (
+          <Classroom
+            key={classroom.id}
+            classroom={classroom}
+            onToggle={onToggleClassroom}
+          />
+        ))}
+
+        {/* Contrôles de caméra avec amortissement pour des mouvements plus fluides */}
+        <OrbitControls
+          enablePan={true}
+          enableZoom={true}
+          enableRotate={true}
+          minDistance={8}
+          maxDistance={25}
+          minPolarAngle={0}
+          maxPolarAngle={Math.PI / 2.2}
+          autoRotate={false}
+          enableDamping={true}
+          dampingFactor={0.05}
+          rotateSpeed={0.5}
+          zoomSpeed={0.8}
+          panSpeed={0.8}
+        />
+      </Canvas>
+    </div>
+  );
+};
