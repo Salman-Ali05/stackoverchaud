@@ -74,7 +74,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ classrooms, stats }) => {
                 <div className="flex items-center space-x-4">
                   <div
                     className={`w-4 h-4 rounded-full ${
-                      classroom.isOccupied ? 'bg-red-500' : 'bg-green-500'
+                      isSelected ? 'bg-blue-500' : classroom.isOccupied ? 'bg-red-500' : 'bg-green-500'
                     }`}
                   />
                   <div>
