@@ -1,0 +1,112 @@
+import React, { useState } from 'react';
+import { Building2, BarChart3, Eye, Settings } from 'lucide-react';
+import { Scene3D } from './components/Scene3D';
+import { Dashboard } from './components/Dashboard';
+import { useClassrooms } from './hooks/useClassrooms';
+
+function App() {
+  const { classrooms, stats, toggleClassroom } = useClassrooms();
+  const [activeTab, setActiveTab] = useState<'3d' | 'dashboard'>('3d');
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+      {/* Header */}
+      <header className="bg-white shadow-sm border-b border-slate-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center space-x-3">
+              <Building2 className="w-8 h-8 text-blue-600" />
+              <div>
+                <h1 className="text-xl font-bold text-slate-900">ClassRoom Manager</h1>
+                <p className="text-sm text-slate-600">Gestion des salles de cours</p>
+              </div>
+            </div>
+            
+            <div className="flex items-center space-x-4">
+              <div className="flex bg-slate-100 rounded-lg p-1">
+                <button
+                  onClick={() => setActiveTab('3d')}
+                  className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    activeTab === '3d'
+                      ? 'bg-white text-blue-600 shadow-sm'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  <Eye className="w-4 h-4" />
+                  <span>Vue 3D</span>
+                </button>
+                <button
+                  onClick={() => setActiveTab('dashboard')}
+                  className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    activeTab === 'dashboard'
+                      ? 'bg-white text-blue-600 shadow-sm'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  <BarChart3 className="w-4 h-4" />
+                  <span>Dashboard</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {activeTab === '3d' ? (
+          <div className="space-y-8">
+            {/* Instructions */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <div className="flex items-start space-x-3">
+                <Settings className="w-5 h-5 text-blue-600 mt-0.5" />
+                <div>
+                  <h3 className="text-sm font-medium text-blue-900">Instructions</h3>
+                  <p className="text-sm text-blue-700 mt-1">
+                    Cliquez sur les salles de classe pour changer leur état (libre/occupé). 
+                    Utilisez la souris pour naviguer dans la vue 3D.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Vue 3D */}
+            <Scene3D classrooms={classrooms} onToggleClassroom={toggleClassroom} />
+
+            {/* Statistiques rapides */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-slate-900">{stats.total}</p>
+                  <p className="text-sm text-slate-600">Total</p>
+                </div>
+              </div>
+              <div className="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-green-600">{stats.available}</p>
+                  <p className="text-sm text-slate-600">Disponibles</p>
+                </div>
+              </div>
+              <div className="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-red-600">{stats.occupied}</p>
+                  <p className="text-sm text-slate-600">Occupées</p>
+                </div>
+              </div>
+              <div className="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-purple-600">{stats.occupancyRate}%</p>
+                  <p className="text-sm text-slate-600">Occupation</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <Dashboard classrooms={classrooms} stats={stats} />
+        )}
+      </main>
+    </div>
+  );
+}
+
+export default App;
