@@ -1,5 +1,5 @@
 const User = require('../models/user.model');
-const db = require('../config/db.config');
+const db = require('../config/db.config.init');
 const bcrypt = require('bcryptjs');
 const { JWT_SECRET_KEY } = require('../utils/secrets');
 const jwt = require('jsonwebtoken');
