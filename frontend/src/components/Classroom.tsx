@@ -1,18 +1,20 @@
-import React, { useRef, useState } from 'react';
+import React, { useContext, useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
 import { Group } from 'three';
 import { ClassroomData } from '../types/classroom';
+import { ClassroomContext } from '../hooks/ClassroomProvider';
 
 interface ClassroomProps {
   classroom: ClassroomData;
-  onToggle: (id: string) => void;
 }
 
-export const Classroom: React.FC<ClassroomProps> = ({ classroom, onToggle }) => {
+export const Classroom: React.FC<ClassroomProps> = ({ classroom }) => {
   const groupRef = useRef<Group>(null);
   const letterRef = useRef<Group>(null);
   const [hovered, setHovered] = useState(false);
+
+  const { setSelectedClassroom, selectedClassroom } = useContext(ClassroomContext);
 
   useFrame((state) => {
     if (groupRef.current) {
@@ -27,20 +29,26 @@ export const Classroom: React.FC<ClassroomProps> = ({ classroom, onToggle }) => 
   });
 
   const handleClick = () => {
-    if (!classroom.isOccupied) {
-      onToggle(classroom.id);
+    if (selectedClassroom?.id === classroom.id) {
+      setSelectedClassroom(null);
+    } else {
+      setSelectedClassroom(classroom);
     }
   };
 
-  const floorColor = classroom.isOccupied ? '#FEE2E2' : '#DCFCE7';
-  const chairColor = classroom.isOccupied ? '#DC2626' : '#16A34A';
+  const isClassroomSelected = selectedClassroom?.id === classroom.id && !selectedClassroom.isOccupied;
+
+  const floorColor = isClassroomSelected ? '#DBEAFE' : classroom.isOccupied ? '#FEE2E2' : '#DCFCE7';
+  const chairColor = isClassroomSelected ? '#2563EB' : classroom.isOccupied ? '#DC2626' : '#16A34A';
   const tableColor = '#8B5CF6';
 
   return (
     <group 
       ref={groupRef}
       position={classroom.position}
-      onClick={handleClick}
+      onClick={() => {
+        handleClick();
+      }}
       onPointerOver={() => setHovered(true)}
       onPointerOut={() => setHovered(false)}
     >
@@ -211,7 +219,7 @@ export const Classroom: React.FC<ClassroomProps> = ({ classroom, onToggle }) => 
         <mesh position={[0, 0, -0.1]}>
           <circleGeometry args={[0.6]} />
           <meshStandardMaterial 
-            color={classroom.isOccupied ? '#FEE2E2' : '#DCFCE7'}
+            color={isClassroomSelected ? '#DBEAFE' : classroom.isOccupied ? '#FEE2E2' : '#DCFCE7'}
             transparent
             opacity={0.8}
           />
@@ -219,7 +227,7 @@ export const Classroom: React.FC<ClassroomProps> = ({ classroom, onToggle }) => 
         
         <Text
           fontSize={0.8}
-          color={classroom.isOccupied ? '#DC2626' : '#16A34A'}
+          color={isClassroomSelected ? '#2563EB' : classroom.isOccupied ? '#DC2626' : '#16A34A'}
           anchorX="center"
           anchorY="middle"
         >
@@ -231,8 +239,8 @@ export const Classroom: React.FC<ClassroomProps> = ({ classroom, onToggle }) => 
       <mesh position={[0, 3.2, 0]}>
         <sphereGeometry args={[0.15]} />
         <meshStandardMaterial
-          color={classroom.isOccupied ? '#DC2626' : '#16A34A'}
-          emissive={classroom.isOccupied ? '#7F1D1D' : '#064E3B'}
+          color={isClassroomSelected ? '#2563EB' : classroom.isOccupied ? '#DC2626' : '#16A34A'}
+          emissive={isClassroomSelected ? '#2563EB' : classroom.isOccupied ? '#7F1D1D' : '#064E3B'}
           emissiveIntensity={0.3}
         />
       </mesh>

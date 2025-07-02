@@ -9,7 +9,8 @@ interface Scene3DProps {
   onToggleClassroom: (id: string) => void;
 }
 
-export const Scene3D: React.FC<Scene3DProps> = ({ classrooms, onToggleClassroom }) => {
+export const Scene3D: React.FC<Scene3DProps> = ({ classrooms }) => {
+
   return (
     <div className="w-full h-[500px] bg-gradient-to-br from-slate-900 to-slate-800 rounded-xl overflow-hidden shadow-2xl">
       <Canvas
@@ -85,7 +86,6 @@ export const Scene3D: React.FC<Scene3DProps> = ({ classrooms, onToggleClassroom 
           <Classroom
             key={classroom.id}
             classroom={classroom}
-            onToggle={onToggleClassroom}
           />
         ))}
 

@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { createContext, useState, ReactNode, useMemo } from 'react';
 import { ClassroomData, ClassroomStats } from '../types/classroom';
 
 const initialClassrooms: ClassroomData[] = [
@@ -52,15 +52,37 @@ const initialClassrooms: ClassroomData[] = [
   },
 ];
 
-export const useClassrooms = () => {
+interface ClassroomContextProps {
+  classrooms: ClassroomData[];
+  setClassrooms: (classrooms: ClassroomData[]) => void;
+  selectedClassroom: ClassroomData | null;
+  setSelectedClassroom: (c: ClassroomData | null) => void;
+  toggleClassroom: (id: string) => void;
+  stats: ClassroomStats;
+}
+
+export const ClassroomContext = createContext<ClassroomContextProps>({
+  classrooms: [],
+  setClassrooms: () => {},
+  selectedClassroom: null,
+  setSelectedClassroom: () => {},
+  toggleClassroom: () => {},
+  stats: {
+    total: 0,
+    occupied: 0,
+    available: 0,
+    occupancyRate: 0,
+  },
+});
+
+export const ClassroomProvider = ({ children }: { children: ReactNode }) => {
   const [classrooms, setClassrooms] = useState<ClassroomData[]>(initialClassrooms);
+  const [selectedClassroom, setSelectedClassroom] = useState<ClassroomData | null>(null);
 
   const toggleClassroom = (id: string) => {
     setClassrooms(prev =>
-      prev.map(classroom =>
-        classroom.id === id
-          ? { ...classroom, isOccupied: !classroom.isOccupied }
-          : classroom
+      prev.map(c =>
+        c.id === id ? { ...c, isOccupied: !c.isOccupied } : c
       )
     );
   };
@@ -70,18 +92,21 @@ export const useClassrooms = () => {
     const occupied = classrooms.filter(c => c.isOccupied).length;
     const available = total - occupied;
     const occupancyRate = Math.round((occupied / total) * 100);
-
-    return {
-      total,
-      occupied,
-      available,
-      occupancyRate,
-    };
+    return { total, occupied, available, occupancyRate };
   }, [classrooms]);
 
-  return {
-    classrooms,
-    stats,
-    toggleClassroom,
-  };
+  return (
+    <ClassroomContext.Provider
+      value={{
+        classrooms,
+        setClassrooms,
+        selectedClassroom,
+        setSelectedClassroom,
+        toggleClassroom,
+        stats,
+      }}
+    >
+      {children}
+    </ClassroomContext.Provider>
+  );
 };
