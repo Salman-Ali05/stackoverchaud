@@ -14,7 +14,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ classrooms, stats }) => {
   
   return (
     <div className="space-y-6">
-      {/* Statistiques générales */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="bg-white p-6 rounded-xl shadow-lg border border-slate-200">
           <div className="flex items-center space-x-3">
@@ -57,7 +56,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ classrooms, stats }) => {
         </div>
       </div>
 
-      {/* Liste des salles */}
       <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
         <div className="px-6 py-4 border-b border-slate-200">
           <h3 className="text-lg font-semibold text-slate-900">État des Salles de Classe</h3>

@@ -1,8 +1,11 @@
 import { useContext, useState } from 'react';
-import { Building2, BarChart3, Eye, Settings } from 'lucide-react';
+import { Building2, BarChart3, Eye, Settings, LogOut } from 'lucide-react';
 import { ClassroomContext } from '../hooks/ClassroomContext';
 import { Dashboard } from '../components/Dashboard';
 import { Scene3D } from '../components/Scene3D';
+import Logo from '../assets/Logo.png';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../hooks/AuthContext';
 
 export function AppContentPage() {
   const {
@@ -14,6 +17,13 @@ export function AppContentPage() {
   } = useContext(ClassroomContext);
 
   const [activeTab, setActiveTab] = useState<'3d' | 'dashboard'>('3d');
+  const navigate = useNavigate();
+  const { logout } = useAuth();
+
+  function handleLogout() {
+    navigate('/');
+    logout();
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
@@ -21,11 +31,7 @@ export function AppContentPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-3">
-              <Building2 className="w-8 h-8 text-blue-600" />
-              <div>
-                <h1 className="text-xl font-bold text-slate-900">ClassRoom</h1>
-                <p className="text-sm text-slate-600">Manager</p>
-              </div>
+              <img src={Logo} alt='logo' className='w-20' />
             </div>
 
             <div className="flex items-center space-x-4">
@@ -53,6 +59,13 @@ export function AppContentPage() {
                   <span>Dashboard</span>
                 </button>
               </div>
+              <button
+                onClick={handleLogout}
+                className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium text-slate-600 hover:text-red-900 transition-colors background-transparent hover:bg-red-50`}
+              >
+                <LogOut className="w-4 h-4" />
+                <span>Logout</span>
+              </button>
             </div>
           </div>
         </div>
