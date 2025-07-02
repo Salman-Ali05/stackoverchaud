@@ -1,11 +1,36 @@
-const db = require('../../config/db.config');
-const { createTableUsers } = require('../queries');
+const db = require('../../config/db.config.init');
+const {
+  createTableUsers,
+  createTableRooms,
+  createTableReservations,
+  createTableNotifications
+} = require('../queries');
 
-db.query(createTableUsers, (err) => {
-    if (err) {
-        console.error('❌ Failed to create `users` table:', err.message);
-        process.exit(1);
+// Liste des requêtes dans l’ordre à exécuter
+const createTables = [
+  { name: 'users', query: createTableUsers },
+  { name: 'rooms', query: createTableRooms },
+  { name: 'reservations', query: createTableReservations },
+  { name: 'notifications', query: createTableNotifications }
+];
+
+(async () => {
+  for (const table of createTables) {
+    try {
+      await new Promise((resolve, reject) => {
+        db.query(table.query, (err) => {
+          if (err) {
+            console.error(`❌ Failed to create \`${table.name}\` table:`, err.message);
+            reject(err);
+          } else {
+            console.log(`✅ Table \`${table.name}\` created successfully`);
+            resolve();
+          }
+        });
+      });
+    } catch (e) {
+      process.exit(1);
     }
-    console.log('✅ Table `users` created successfully');
-    process.exit(0);
-});
+  }
+  process.exit(0);
+})();
