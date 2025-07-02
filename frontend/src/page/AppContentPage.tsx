@@ -1,10 +1,10 @@
 import { useContext, useState } from 'react';
 import { Building2, BarChart3, Eye, Settings } from 'lucide-react';
 import { ClassroomContext } from '../hooks/ClassroomProvider';
-import { Dashboard } from './Dashboard';
-import { Scene3D } from './Scene3D';
+import { Dashboard } from '../components/Dashboard';
+import { Scene3D } from '../components/Scene3D';
 
-export function AppContent() {
+export function AppContentPage() {
   const {
     toggleClassroom,
     stats,
@@ -17,7 +17,6 @@ export function AppContent() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
-      {/* Header */}
       <header className="bg-white shadow-sm border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
@@ -59,11 +58,9 @@ export function AppContent() {
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {activeTab === '3d' ? (
           <div className="space-y-8">
-            {/* Instructions */}
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
               <div className="flex items-start space-x-3">
                 <Settings className="w-5 h-5 text-blue-600 mt-0.5" />
@@ -116,10 +113,8 @@ export function AppContent() {
               </div>
             )}
 
-            {/* Vue 3D */}
             <Scene3D classrooms={classrooms} onToggleClassroom={toggleClassroom} />
 
-            {/* Statistiques rapides */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
                 <div className="text-center">
