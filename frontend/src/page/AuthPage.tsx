@@ -73,7 +73,7 @@ export const AuthPage: React.FC = () => {
           <p className="text-slate-600">
             {isLogin 
               ? 'Accédez à votre espace de gestion 3D' 
-              : 'Rejoignez ClassRoom Manager 3D'
+              : 'Rejoignez Eduresa'
             }
           </p>
         </div>
