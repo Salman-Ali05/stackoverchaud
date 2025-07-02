@@ -1,3 +1,15 @@
+/**
+ * @swagger
+ * /users:
+ *   get:
+ *     summary: Récupérer tous les utilisateurs
+ *     tags: [Users]
+ *     responses:
+ *       200:
+ *         description: Liste des utilisateurs
+ */
+
+
 const express = require('express');
 const router = express.Router();
 const userController = require('../controller/user.controller');

@@ -1,4 +1,4 @@
-const db = require('../config/db.config');
+const db = require('../config/db.config.init');
 
 const Room = {
   create: (data, cb) => {
