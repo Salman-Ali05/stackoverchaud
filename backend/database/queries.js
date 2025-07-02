@@ -1,7 +1,6 @@
 const { DB_NAME } = require('../utils/secrets');
 
 const createDB = `CREATE DATABASE IF NOT EXISTS ${DB_NAME}`;
-
 const dropDB = `DROP DATABASE IF EXISTS ${DB_NAME}`;
 
 const createTableUsers = `
@@ -18,7 +17,7 @@ CREATE TABLE IF NOT EXISTS users (
 )
 `;
 
-const createNewUser = `
+const createNewUserQuery = `
 INSERT INTO users (
   firstname,
   lastname,
@@ -31,14 +30,14 @@ INSERT INTO users (
 ) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())
 `;
 
-const findUserByEmail = `
+const findUserByEmailQuery = `
 SELECT * FROM users WHERE email = ?
 `;
 
 module.exports = {
-    createDB,
-    dropDB,
-    createTableUsers,
-    createNewUser,
-    findUserByEmail,
+  createDB,
+  dropDB,
+  createTableUsers,
+  createNewUserQuery,
+  findUserByEmailQuery
 };

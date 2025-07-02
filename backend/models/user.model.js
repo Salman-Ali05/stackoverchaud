@@ -1,60 +1,26 @@
 const db = require('../config/db.config');
 const { createNewUserQuery, findUserByEmailQuery } = require('../database/queries');
 
-class User {
-    constructor(firstname, lastname, email, password, role, invitationToken = null, structureId = null) {
-        this.firstname = firstname;
-        this.lastname = lastname;
-        this.email = email;
-        this.password = password;
-        this.role = role;
-        this.invitationToken = invitationToken;
-        this.structureId = structureId;
-    }
+const User = {
+  create: (newUser, cb) => {
+    db.query(createNewUserQuery, [
+      newUser.firstName,
+      newUser.lastName,
+      newUser.email,
+      newUser.password,
+      newUser.role,
+      newUser.invitationToken,
+      newUser.structureId
+    ], cb);
+  },
 
-    static create(newUser, cb) {
-        db.query(
-            createNewUserQuery,
-            [
-                newUser.firstname,
-                newUser.lastname,
-                newUser.email,
-                newUser.password,
-                newUser.role,
-                newUser.invitationToken,
-                newUser.structureId
-            ],
-            (err, res) => {
-                if (err) {
-                    console.error('❌ Error creating user:', err.message);
-                    cb(err, null);
-                    return;
-                }
-                cb(null, {
-                    id: res.insertId,
-                    firstname: newUser.firstname,
-                    lastname: newUser.lastname,
-                    email: newUser.email,
-                    role: newUser.role
-                });
-            }
-        );
-    }
-
-    static findByEmail(email, cb) {
-        db.query(findUserByEmailQuery, [email], (err, res) => {
-            if (err) {
-                console.error('❌ Error finding user by email:', err.message);
-                cb(err, null);
-                return;
-            }
-            if (res.length) {
-                cb(null, res[0]);
-                return;
-            }
-            cb({ kind: 'not_found' }, null);
-        });
-    }
-}
+  findByEmail: (email, cb) => {
+    db.query(findUserByEmailQuery, [email], (err, results) => {
+      if (err) return cb(err, null);
+      if (results.length === 0) return cb(null, null);
+      cb(null, results[0]);
+    });
+  }
+};
 
 module.exports = User;
