@@ -12,6 +12,7 @@ import {
   Globe,
   Shield
 } from 'lucide-react';
+import Logo from '../assets/Logo.png';
 
 export const LandingPage: React.FC = () => {
   const navigate = useNavigate();
@@ -37,10 +38,8 @@ export const LandingPage: React.FC = () => {
             
             <h1 className="text-5xl md:text-7xl font-bold text-slate-900 mb-6 leading-tight">
               <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                ClassRoom
+                Eduresa
               </span>
-              <br />
-              <span className="text-slate-700">Manager 3D</span>
             </h1>
             
             <p className="text-xl md:text-2xl text-slate-600 mb-8 max-w-3xl mx-auto leading-relaxed">
@@ -208,7 +207,7 @@ export const LandingPage: React.FC = () => {
             Prêt à révolutionner votre gestion ?
           </h2>
           <p className="text-xl text-blue-100 mb-8 leading-relaxed">
-            Découvrez dès maintenant comment ClassRoom Manager 3D peut transformer 
+            Découvrez dès maintenant comment <strong>Eduresa</strong> peut transformer 
             la façon dont vous gérez vos espaces éducatifs.
           </p>
           
@@ -244,14 +243,14 @@ export const LandingPage: React.FC = () => {
             <div className="flex items-center space-x-3 mb-4 md:mb-0">
               <Building2 className="w-8 h-8 text-blue-400" />
               <div>
-                <div className="text-white font-bold text-lg">ClassRoom Manager 3D</div>
+                <div className="text-white font-bold text-lg">Eduresa</div>
                 <div className="text-sm">Gestion intelligente des espaces éducatifs</div>
               </div>
             </div>
             
             <div className="text-center md:text-right">
               <p className="text-sm">
-                © 2025 ClassRoom Manager 3D. Conçu avec passion pour l'éducation.
+                © 2025 Eduresa. Conçu avec passion pour l'éducation.
               </p>
             </div>
           </div>
