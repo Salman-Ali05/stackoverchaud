@@ -23,8 +23,8 @@ export function AppContentPage() {
             <div className="flex items-center space-x-3">
               <Building2 className="w-8 h-8 text-blue-600" />
               <div>
-                <h1 className="text-xl font-bold text-slate-900">ClassRoom Manager</h1>
-                <p className="text-sm text-slate-600">Gestion des salles de cours</p>
+                <h1 className="text-xl font-bold text-slate-900">ClassRoom</h1>
+                <p className="text-sm text-slate-600">Manager</p>
               </div>
             </div>
 
