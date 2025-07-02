@@ -3,7 +3,7 @@ import { useFrame } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
 import { Group } from 'three';
 import { ClassroomData } from '../types/classroom';
-import { ClassroomContext } from '../hooks/ClassroomProvider';
+import { ClassroomContext } from '../hooks/ClassroomContext';
 
 interface ClassroomProps {
   classroom: ClassroomData;

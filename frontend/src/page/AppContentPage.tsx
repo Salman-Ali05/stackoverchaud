@@ -1,6 +1,6 @@
 import { useContext, useState } from 'react';
 import { Building2, BarChart3, Eye, Settings } from 'lucide-react';
-import { ClassroomContext } from '../hooks/ClassroomProvider';
+import { ClassroomContext } from '../hooks/ClassroomContext';
 import { Dashboard } from '../components/Dashboard';
 import { Scene3D } from '../components/Scene3D';
 
