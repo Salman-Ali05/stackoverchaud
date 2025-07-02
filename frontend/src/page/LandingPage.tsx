@@ -17,7 +17,7 @@ export const LandingPage: React.FC = () => {
   const navigate = useNavigate();
 
   const handleGetStarted = () => {
-    navigate('/dashboard');
+    navigate('/auth');
   };
 
   return (

@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { Building2, Users, CheckCircle, AlertCircle } from 'lucide-react';
 import { ClassroomData, ClassroomStats } from '../types/classroom';
-import { ClassroomContext } from '../hooks/ClassroomProvider';
+import { ClassroomContext } from '../hooks/ClassroomContext';
 
 interface DashboardProps {
   classrooms: ClassroomData[];
