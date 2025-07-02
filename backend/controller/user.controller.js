@@ -1,4 +1,5 @@
 const User = require('../models/user.model');
+const db = require('../config/db.config');
 const bcrypt = require('bcryptjs');
 
 exports.createUser = (req, res) => {
@@ -61,5 +62,56 @@ exports.getUserByEmail = (req, res) => {
       status: 'success',
       data: user
     });
+  });
+};
+
+exports.getAllUsers = (req, res) => {
+  const query = 'SELECT * FROM users';
+
+  db.query(query, (err, results) => {
+    if (err) {
+      return res.status(500).json({ status: 'error', message: err.message });
+    }
+    res.status(200).json({ status: 'success', data: results });
+  });
+};
+
+exports.getUserById = (req, res) => {
+  const { id } = req.params;
+  const query = 'SELECT * FROM users WHERE id = ?';
+
+  db.query(query, [id], (err, results) => {
+    if (err) return res.status(500).json({ status: 'error', message: err.message });
+    if (results.length === 0) return res.status(404).json({ status: 'error', message: 'User not found' });
+
+    res.status(200).json({ status: 'success', data: results[0] });
+  });
+};
+
+exports.updateUser = (req, res) => {
+  const { id } = req.params;
+  const { firstName, lastName, email, role } = req.body;
+
+  const query = `
+    UPDATE users 
+    SET firstName = ?, lastName = ?, email = ?, role = ?
+    WHERE id = ?
+  `;
+
+  db.query(query, [firstName, lastName, email, role, id], (err, result) => {
+    if (err) return res.status(500).json({ status: 'error', message: err.message });
+
+    res.status(200).json({ status: 'success', message: 'User updated successfully' });
+  });
+};
+
+exports.deleteUser = (req, res) => {
+  const { id } = req.params;
+  const query = 'DELETE FROM users WHERE id = ?';
+
+  db.query(query, [id], (err, result) => {
+    if (err) return res.status(500).json({ status: 'error', message: err.message });
+
+    res.status(200).json({ status: 'success', message: 'User deleted successfully' });
   });
 };
