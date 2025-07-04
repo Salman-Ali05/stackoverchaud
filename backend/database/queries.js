@@ -1,8 +1,24 @@
 const { DB_NAME } = require('../utils/secrets');
 
+/* ------------------------- DATABASE INIT ------------------------- */
 const createDB = `CREATE DATABASE IF NOT EXISTS ${DB_NAME}`;
 const dropDB = `DROP DATABASE IF EXISTS ${DB_NAME}`;
 
+/* ----------------------------- ROLES ----------------------------- */
+const createTableRoles = `
+CREATE TABLE IF NOT EXISTS roles (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(50) NOT NULL UNIQUE
+)
+`;
+
+const insertDefaultRoles = `
+INSERT INTO roles (name)
+VALUES ('admin'), ('structure'), ('teacher'), ('student')
+ON DUPLICATE KEY UPDATE name = name
+`;
+
+/* ----------------------------- USERS ----------------------------- */
 const createTableUsers = `
 CREATE TABLE IF NOT EXISTS users (
   id INT PRIMARY KEY AUTO_INCREMENT,
@@ -10,12 +26,15 @@ CREATE TABLE IF NOT EXISTS users (
   last_name VARCHAR(100) NOT NULL,
   email VARCHAR(255) NOT NULL UNIQUE,
   password VARCHAR(255) NOT NULL,
-  role VARCHAR(50) NOT NULL,
-  invitation_token VARCHAR(255),
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  role_id INT NOT NULL,
+  invitation_id INT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_user_role FOREIGN KEY (role_id) REFERENCES roles(id),
+  CONSTRAINT fk_user_invitation FOREIGN KEY (invitation_id) REFERENCES invitations_registration(id)
 )
 `;
 
+/* -------------------------- ROOMS -------------------------- */
 const createTableRooms = `
 CREATE TABLE IF NOT EXISTS rooms (
   id INT PRIMARY KEY AUTO_INCREMENT,
@@ -28,6 +47,7 @@ CREATE TABLE IF NOT EXISTS rooms (
 )
 `;
 
+/* ----------------------- RESERVATIONS ---------------------- */
 const createTableReservations = `
 CREATE TABLE IF NOT EXISTS reservations (
   id INT PRIMARY KEY AUTO_INCREMENT,
@@ -44,6 +64,7 @@ CREATE TABLE IF NOT EXISTS reservations (
 )
 `;
 
+/* ------------------------ NOTIFICATIONS ------------------------ */
 const createTableNotifications = `
 CREATE TABLE IF NOT EXISTS notifications (
   id INT PRIMARY KEY AUTO_INCREMENT,
@@ -58,13 +79,25 @@ CREATE TABLE IF NOT EXISTS notifications (
 )
 `;
 
+/* -------------------- INVITATION REGISTRATION ------------------- */
+const createTableInvitations = `
+CREATE TABLE IF NOT EXISTS invitations_registration (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  email VARCHAR(255) NOT NULL UNIQUE,
+  token VARCHAR(255) NOT NULL UNIQUE,
+  used BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)
+`;
+
+/* ------------------------- USER QUERIES ------------------------- */
 const createNewUserQuery = `
 INSERT INTO users (
   first_name,
   last_name,
   email,
   password,
-  role,
+  role_id,
   invitation_token,
   created_at
 ) VALUES (?, ?, ?, ?, ?, ?, NOW())
@@ -74,13 +107,17 @@ const findUserByEmailQuery = `
 SELECT * FROM users WHERE email = ?
 `;
 
+/* --------------------------- EXPORT ----------------------------- */
 module.exports = {
   createDB,
   dropDB,
+  createTableRoles,
+  insertDefaultRoles,
   createTableUsers,
   createTableRooms,
   createTableReservations,
   createTableNotifications,
+  createTableInvitations,
   createNewUserQuery,
   findUserByEmailQuery
 };

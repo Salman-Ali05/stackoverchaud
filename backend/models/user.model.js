@@ -1,5 +1,8 @@
 const db = require('../config/db.config.init');
-const { createNewUserQuery, findUserByEmailQuery } = require('../database/queries');
+const {
+  createNewUserQuery,
+  findUserByEmailQuery
+} = require('../database/queries');
 
 const User = {
   create: (newUser, cb) => {
@@ -8,9 +11,8 @@ const User = {
       newUser.lastName,
       newUser.email,
       newUser.password,
-      newUser.role,
-      newUser.invitationToken,
-      newUser.structureId
+      newUser.role_id,
+      newUser.invitation_id ?? null
     ], cb);
   },
 

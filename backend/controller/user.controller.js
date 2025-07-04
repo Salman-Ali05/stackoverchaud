@@ -1,13 +1,13 @@
 const User = require('../models/user.model');
 const db = require('../config/db.config.init');
 const bcrypt = require('bcryptjs');
-const { JWT_SECRET_KEY } = require('../utils/secrets');
 const jwt = require('jsonwebtoken');
+const { JWT_SECRET_KEY } = require('../utils/secrets');
 
 exports.createUser = (req, res) => {
-  const { firstName, lastName, email, password, role, invitationToken, structureId } = req.body;
+  const { firstName, lastName, email, password, role_id, invitation_id } = req.body;
 
-  if (!firstName || !lastName || !email || !password || !role) {
+  if (!firstName || !lastName || !email || !password || !role_id) {
     return res.status(400).json({
       status: 'error',
       message: 'Missing required fields'
@@ -21,9 +21,8 @@ exports.createUser = (req, res) => {
     lastName: lastName.trim(),
     email: email.trim(),
     password: hashedPassword,
-    role,
-    invitationToken: invitationToken || null,
-    structureId: structureId || null
+    role_id,
+    invitation_id: invitation_id || null
   };
 
   User.create(newUser, (err, result) => {
@@ -47,23 +46,13 @@ exports.getUserByEmail = (req, res) => {
 
   User.findByEmail(email.trim(), (err, user) => {
     if (err) {
-      return res.status(500).json({
-        status: 'error',
-        message: err.message
-      });
+      return res.status(500).json({ status: 'error', message: err.message });
     }
-
     if (!user) {
-      return res.status(404).json({
-        status: 'error',
-        message: 'User not found'
-      });
+      return res.status(404).json({ status: 'error', message: 'User not found' });
     }
 
-    res.status(200).json({
-      status: 'success',
-      data: user
-    });
+    res.status(200).json({ status: 'success', data: user });
   });
 };
 
@@ -71,9 +60,7 @@ exports.getAllUsers = (req, res) => {
   const query = 'SELECT * FROM users';
 
   db.query(query, (err, results) => {
-    if (err) {
-      return res.status(500).json({ status: 'error', message: err.message });
-    }
+    if (err) return res.status(500).json({ status: 'error', message: err.message });
     res.status(200).json({ status: 'success', data: results });
   });
 };
@@ -92,15 +79,15 @@ exports.getUserById = (req, res) => {
 
 exports.updateUser = (req, res) => {
   const { id } = req.params;
-  const { firstName, lastName, email, role } = req.body;
+  const { firstName, lastName, email, role_id } = req.body;
 
   const query = `
     UPDATE users 
-    SET firstName = ?, lastName = ?, email = ?, role = ?
+    SET first_name = ?, last_name = ?, email = ?, role_id = ?
     WHERE id = ?
   `;
 
-  db.query(query, [firstName, lastName, email, role, id], (err, result) => {
+  db.query(query, [firstName, lastName, email, role_id, id], (err) => {
     if (err) return res.status(500).json({ status: 'error', message: err.message });
 
     res.status(200).json({ status: 'success', message: 'User updated successfully' });
@@ -111,7 +98,7 @@ exports.deleteUser = (req, res) => {
   const { id } = req.params;
   const query = 'DELETE FROM users WHERE id = ?';
 
-  db.query(query, [id], (err, result) => {
+  db.query(query, [id], (err) => {
     if (err) return res.status(500).json({ status: 'error', message: err.message });
 
     res.status(200).json({ status: 'success', message: 'User deleted successfully' });
@@ -129,30 +116,16 @@ exports.login = (req, res) => {
   }
 
   User.findByEmail(email.trim(), (err, user) => {
-    if (err) {
-      return res.status(500).json({
-        status: 'error',
-        message: err.message
-      });
-    }
-
-    if (!user) {
-      return res.status(404).json({
-        status: 'error',
-        message: 'User not found'
-      });
-    }
+    if (err) return res.status(500).json({ status: 'error', message: err.message });
+    if (!user) return res.status(404).json({ status: 'error', message: 'User not found' });
 
     const isMatch = bcrypt.compareSync(password.trim(), user.password);
     if (!isMatch) {
-      return res.status(401).json({
-        status: 'error',
-        message: 'Invalid password'
-      });
+      return res.status(401).json({ status: 'error', message: 'Invalid password' });
     }
 
     const token = jwt.sign(
-      { id: user.id, role: user.role },
+      { id: user.id, role_id: user.role_id },
       JWT_SECRET_KEY,
       { expiresIn: '24h' }
     );
@@ -163,10 +136,10 @@ exports.login = (req, res) => {
       token,
       user: {
         id: user.id,
-        firstName: user.firstname,
-        lastName: user.lastname,
+        firstName: user.first_name,
+        lastName: user.last_name,
         email: user.email,
-        role: user.role
+        role_id: user.role_id
       }
     });
   });

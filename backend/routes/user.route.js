@@ -1,16 +1,5 @@
 /**
  * @swagger
- * /users:
- *   get:
- *     summary: Récupérer tous les utilisateurs
- *     tags: [Users]
- *     responses:
- *       200:
- *         description: Liste des utilisateurs
- */
-
-/**
- * @swagger
  * tags:
  *   name: Users
  *   description: Gestion des utilisateurs
@@ -65,9 +54,11 @@
  *                 type: string
  *               password:
  *                 type: string
- *               role:
- *                 type: string
- *                 enum: [admin, manager, teacher, student]
+ *               role_id:
+ *                 type: integer
+ *               invitation_id:
+ *                 type: integer
+ *                 nullable: true
  *     responses:
  *       201:
  *         description: Utilisateur créé
@@ -142,8 +133,8 @@
  *                 type: string
  *               email:
  *                 type: string
- *               role:
- *                 type: string
+ *               role_id:
+ *                 type: integer
  *     responses:
  *       200:
  *         description: Utilisateur mis à jour
@@ -174,8 +165,6 @@
  *       404:
  *         description: Utilisateur non trouvé
  */
-
-
 
 const express = require('express');
 const router = express.Router();

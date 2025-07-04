@@ -1,17 +1,22 @@
 const db = require('../../config/db.config.init');
 const {
+  createTableRoles,
+  insertDefaultRoles,
   createTableUsers,
   createTableRooms,
   createTableReservations,
-  createTableNotifications
+  createTableNotifications,
+  createTableInvitations
 } = require('../queries');
 
-// Liste des requêtes dans l’ordre à exécuter
 const createTables = [
+  { name: 'roles', query: createTableRoles },
+  { name: 'insert default roles', query: insertDefaultRoles },
   { name: 'users', query: createTableUsers },
   { name: 'rooms', query: createTableRooms },
   { name: 'reservations', query: createTableReservations },
-  { name: 'notifications', query: createTableNotifications }
+  { name: 'notifications', query: createTableNotifications },
+  { name: 'invitations_registration', query: createTableInvitations }
 ];
 
 (async () => {
@@ -20,10 +25,10 @@ const createTables = [
       await new Promise((resolve, reject) => {
         db.query(table.query, (err) => {
           if (err) {
-            console.error(`❌ Failed to create \`${table.name}\` table:`, err.message);
+            console.error(`❌ Failed to process "${table.name}":`, err.message);
             reject(err);
           } else {
-            console.log(`✅ Table \`${table.name}\` created successfully`);
+            console.log(`✅ "${table.name}" processed successfully`);
             resolve();
           }
         });

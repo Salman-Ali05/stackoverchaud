@@ -1,10 +1,13 @@
 const { dropDB: dropDBQuery } = require('../queries');
+const db = require('../../config/db.config.init');
 
 (() => {
-    require('../../config/db.config.init').query(dropDBQuery, (err, _) => {
+    db.query(dropDBQuery, (err, _) => {
         if (err) {
-            return;
+            console.error('❌ Failed to drop database:', err.message);
+            process.exit(1);
         }
+        console.log('✅ Database dropped successfully');
         process.exit(0);
     });
 })();
