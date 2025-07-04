@@ -1,4 +1,3 @@
-// swagger.js
 const swaggerJSDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 
@@ -15,9 +14,23 @@ const options = {
         url: 'http://localhost:5000/api',
         description: 'Serveur local'
       }
+    ],
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT'
+        }
+      }
+    },
+    security: [
+      {
+        bearerAuth: []
+      }
     ]
   },
-  apis: ['./routes/*.js'] // Fichiers contenant les commentaires Swagger
+  apis: ['./routes/*.js'] // Assure-toi que les commentaires JSDoc sont bien dans ces fichiers
 };
 
 const swaggerSpec = swaggerJSDoc(options);
