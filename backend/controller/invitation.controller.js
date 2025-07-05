@@ -1,5 +1,4 @@
 const Invitation = require('../models/invitation.model');
-const { v4: uuidv4 } = require('uuid');
 
 exports.createInvitation = (req, res) => {
     const { email } = req.body;
@@ -8,7 +7,7 @@ exports.createInvitation = (req, res) => {
         return res.status(400).json({ status: 'error', message: 'Email is required' });
     }
 
-    const token = uuidv4();
+    const token = req.link;
     const invitation = { email, token };
 
     Invitation.create(invitation, (err, result) => {
