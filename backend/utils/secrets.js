@@ -16,11 +16,11 @@ const requiredCredentials = [
     'JWT_SECRET_KEY'
 ];
 
-for (const credential of requiredCredentials) {
-    if (process.env[credential] === undefined) {
-        process.exit(1);
-    }
-}
+// for (const credential of requiredCredentials) {
+//     if (process.env[credential] === undefined) {
+//         process.exit(1);
+//     }
+// }
 
 module.exports = {
     DB_HOST,

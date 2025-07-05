@@ -98,7 +98,7 @@ INSERT INTO users (
   email,
   password,
   role_id,
-  invitation_token,
+  invitation_id,
   created_at
 ) VALUES (?, ?, ?, ?, ?, ?, NOW())
 `;
