@@ -39,6 +39,8 @@
  *   post:
  *     summary: Créer un nouveau rôle
  *     tags: [Roles]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -52,6 +54,8 @@
  *     responses:
  *       201:
  *         description: Rôle créé
+ *       403:
+ *         description: Accès interdit (admin uniquement)
  */
 
 /**
@@ -60,10 +64,14 @@
  *   put:
  *     summary: Modifier un rôle
  *     tags: [Roles]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - name: id
  *         in: path
  *         required: true
+ *         schema:
+ *           type: integer
  *     requestBody:
  *       content:
  *         application/json:
@@ -75,6 +83,8 @@
  *     responses:
  *       200:
  *         description: Rôle mis à jour
+ *       403:
+ *         description: Accès interdit (admin uniquement)
  */
 
 /**
@@ -83,23 +93,36 @@
  *   delete:
  *     summary: Supprimer un rôle
  *     tags: [Roles]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - name: id
  *         in: path
  *         required: true
+ *         schema:
+ *           type: integer
  *     responses:
  *       200:
  *         description: Rôle supprimé
+ *       403:
+ *         description: Accès interdit (admin uniquement)
  */
 
 const express = require('express');
 const router = express.Router();
 const controller = require('../controller/role.controller');
+const verifyToken = require('../middlewares/auth');
+const authorizeRoles = require('../middlewares/roles');
 
+// Public routes
 router.get('/', controller.getAllRoles);
 router.get('/:id', controller.getRoleById);
-router.post('/', controller.createRole);
-router.put('/:id', controller.updateRole);
-router.delete('/:id', controller.deleteRole);
+
+// Authenticated admin-only routes
+router.use(verifyToken);
+
+router.post('/', authorizeRoles('admin'), controller.createRole);
+router.put('/:id', authorizeRoles('admin'), controller.updateRole);
+router.delete('/:id', authorizeRoles('admin'), controller.deleteRole);
 
 module.exports = router;
