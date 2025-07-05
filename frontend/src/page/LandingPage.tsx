@@ -12,7 +12,6 @@ import {
   Globe,
   Shield
 } from 'lucide-react';
-import Logo from '../assets/Logo.png';
 
 export const LandingPage: React.FC = () => {
   const navigate = useNavigate();
