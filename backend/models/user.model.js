@@ -1,28 +1,24 @@
-const db = require('../config/db.config.init');
-const {
-  createNewUserQuery,
-  findUserByEmailQuery
-} = require('../database/queries');
+const mongoose = require('mongoose');
 
-const User = {
-  create: (newUser, cb) => {
-    db.query(createNewUserQuery, [
-      newUser.firstName,
-      newUser.lastName,
-      newUser.email,
-      newUser.password,
-      newUser.role_id,
-      newUser.invitation_id ?? null
-    ], cb);
-  },
+const userSchema = new mongoose.Schema({
+    firstName: { type: String, required: true },
+    lastName: { type: String, required: true },
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    role: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Role',
+        required: true
+    },
+    invitation: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Invitation',
+        default: null
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
+    }
+});
 
-  findByEmail: (email, cb) => {
-    db.query(findUserByEmailQuery, [email], (err, results) => {
-      if (err) return cb(err, null);
-      if (results.length === 0) return cb(null, null);
-      cb(null, results[0]);
-    });
-  }
-};
-
-module.exports = User;
+module.exports = mongoose.model('User', userSchema);

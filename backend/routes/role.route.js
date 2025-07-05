@@ -1,3 +1,9 @@
+const express = require('express');
+const router = express.Router();
+const controller = require('../controller/role.controller');
+const verifyToken = require('../middlewares/auth');
+const authorizeRoles = require('../middlewares/roles');
+
 /**
  * @swagger
  * tags:
@@ -15,6 +21,7 @@
  *       200:
  *         description: Liste des rôles
  */
+router.get('/', controller.getAllRoles);
 
 /**
  * @swagger
@@ -27,11 +34,14 @@
  *         in: path
  *         required: true
  *         schema:
- *           type: integer
+ *           type: string
  *     responses:
  *       200:
  *         description: Détails du rôle
  */
+router.get('/:id', controller.getRoleById);
+
+router.use(verifyToken, authorizeRoles("admin"));
 
 /**
  * @swagger
@@ -54,9 +64,8 @@
  *     responses:
  *       201:
  *         description: Rôle créé
- *       403:
- *         description: Accès interdit (admin uniquement)
  */
+router.post('/', controller.createRole);
 
 /**
  * @swagger
@@ -71,7 +80,7 @@
  *         in: path
  *         required: true
  *         schema:
- *           type: integer
+ *           type: string
  *     requestBody:
  *       content:
  *         application/json:
@@ -83,9 +92,8 @@
  *     responses:
  *       200:
  *         description: Rôle mis à jour
- *       403:
- *         description: Accès interdit (admin uniquement)
  */
+router.put('/:id', controller.updateRole);
 
 /**
  * @swagger
@@ -100,29 +108,11 @@
  *         in: path
  *         required: true
  *         schema:
- *           type: integer
+ *           type: string
  *     responses:
  *       200:
  *         description: Rôle supprimé
- *       403:
- *         description: Accès interdit (admin uniquement)
  */
-
-const express = require('express');
-const router = express.Router();
-const controller = require('../controller/role.controller');
-const verifyToken = require('../middlewares/auth');
-const authorizeRoles = require('../middlewares/roles');
-
-// Public routes
-router.get('/', controller.getAllRoles);
-router.get('/:id', controller.getRoleById);
-
-// Authenticated admin-only routes
-router.use(verifyToken);
-
-router.post('/', authorizeRoles('admin'), controller.createRole);
-router.put('/:id', authorizeRoles('admin'), controller.updateRole);
-router.delete('/:id', authorizeRoles('admin'), controller.deleteRole);
+router.delete('/:id', controller.deleteRole);
 
 module.exports = router;

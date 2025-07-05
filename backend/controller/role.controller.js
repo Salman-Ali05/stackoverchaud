@@ -1,41 +1,53 @@
 const Role = require('../models/role.model');
 
-exports.getAllRoles = (req, res) => {
-    Role.getAll((err, roles) => {
-        if (err) return res.status(500).json({ status: 'error', message: err.message });
+exports.getAllRoles = async (req, res) => {
+    try {
+        const roles = await Role.find();
         res.status(200).json({ status: 'success', data: roles });
-    });
+    } catch (err) {
+        res.status(500).json({ status: 'error', message: err.message });
+    }
 };
 
-exports.getRoleById = (req, res) => {
-    Role.getById(req.params.id, (err, result) => {
-        if (err) return res.status(500).json({ status: 'error', message: err.message });
-        if (result.length === 0) return res.status(404).json({ status: 'error', message: 'Role not found' });
-        res.status(200).json({ status: 'success', data: result[0] });
-    });
+exports.getRoleById = async (req, res) => {
+    try {
+        const role = await Role.findById(req.params.id);
+        if (!role) return res.status(404).json({ status: 'error', message: 'Role not found' });
+
+        res.status(200).json({ status: 'success', data: role });
+    } catch (err) {
+        res.status(500).json({ status: 'error', message: err.message });
+    }
 };
 
-exports.createRole = (req, res) => {
-    const { name } = req.body;
-    if (!name) return res.status(400).json({ status: 'error', message: 'Role name is required' });
-
-    Role.create(name, (err, result) => {
-        if (err) return res.status(500).json({ status: 'error', message: err.message });
-        res.status(201).json({ status: 'success', message: 'Role created', data: { id: result.insertId, name } });
-    });
+exports.createRole = async (req, res) => {
+    try {
+        const role = new Role({ name: req.body.name });
+        await role.save();
+        res.status(201).json({ status: 'success', data: role });
+    } catch (err) {
+        res.status(500).json({ status: 'error', message: err.message });
+    }
 };
 
-exports.updateRole = (req, res) => {
-    const { name } = req.body;
-    Role.update(req.params.id, name, (err) => {
-        if (err) return res.status(500).json({ status: 'error', message: err.message });
-        res.status(200).json({ status: 'success', message: 'Role updated' });
-    });
+exports.updateRole = async (req, res) => {
+    try {
+        const updated = await Role.findByIdAndUpdate(req.params.id, { name: req.body.name }, { new: true });
+        if (!updated) return res.status(404).json({ status: 'error', message: 'Role not found' });
+
+        res.status(200).json({ status: 'success', data: updated });
+    } catch (err) {
+        res.status(500).json({ status: 'error', message: err.message });
+    }
 };
 
-exports.deleteRole = (req, res) => {
-    Role.delete(req.params.id, (err) => {
-        if (err) return res.status(500).json({ status: 'error', message: err.message });
+exports.deleteRole = async (req, res) => {
+    try {
+        const deleted = await Role.findByIdAndDelete(req.params.id);
+        if (!deleted) return res.status(404).json({ status: 'error', message: 'Role not found' });
+
         res.status(200).json({ status: 'success', message: 'Role deleted' });
-    });
+    } catch (err) {
+        res.status(500).json({ status: 'error', message: err.message });
+    }
 };
