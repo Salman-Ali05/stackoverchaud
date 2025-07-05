@@ -18,10 +18,9 @@ export const Scene3D: React.FC<Scene3DProps> = ({ classrooms }) => {
         shadows="soft"
         gl={{ 
           antialias: true,
-          shadowMapType: 2, // PCFSoftShadowMap
+          shadowMapType: 2,
         }}
       >
-        {/* Éclairage optimisé pour éviter les ombres flashy */}
         <ambientLight intensity={0.5} />
         <directionalLight
           position={[10, 12, 8]}
@@ -37,7 +36,6 @@ export const Scene3D: React.FC<Scene3DProps> = ({ classrooms }) => {
           shadow-normalBias={0.02}
         />
         
-        {/* Éclairage d'appoint sans ombres pour éviter les conflits */}
         <pointLight 
           position={[0, 8, 0]} 
           intensity={0.3} 
@@ -57,10 +55,8 @@ export const Scene3D: React.FC<Scene3DProps> = ({ classrooms }) => {
           castShadow={false}
         />
 
-        {/* Environnement avec intensité réduite */}
         <Environment preset="city" environmentIntensity={0.3} />
         
-        {/* Sol principal avec ombres de contact optimisées */}
         <ContactShadows
           position={[0, -0.1, 0]}
           opacity={0.25}
@@ -71,7 +67,6 @@ export const Scene3D: React.FC<Scene3DProps> = ({ classrooms }) => {
           color="#000000"
         />
 
-        {/* Sol de base */}
         <mesh position={[0, -0.2, 0]} receiveShadow>
           <boxGeometry args={[25, 0.2, 15]} />
           <meshStandardMaterial 
@@ -81,7 +76,6 @@ export const Scene3D: React.FC<Scene3DProps> = ({ classrooms }) => {
           />
         </mesh>
 
-        {/* Salles de classe */}
         {classrooms.map((classroom) => (
           <Classroom
             key={classroom.id}
@@ -89,7 +83,6 @@ export const Scene3D: React.FC<Scene3DProps> = ({ classrooms }) => {
           />
         ))}
 
-        {/* Contrôles de caméra avec amortissement pour des mouvements plus fluides */}
         <OrbitControls
           enablePan={true}
           enableZoom={true}
