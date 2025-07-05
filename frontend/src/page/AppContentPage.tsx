@@ -1,5 +1,5 @@
-import { useContext, useState } from 'react';
-import { Building2, BarChart3, Eye, Settings, LogOut } from 'lucide-react';
+import { useContext, useEffect, useState } from 'react';
+import { Building2, BarChart3, Eye, Settings, LogOut, Minimize, Maximize } from 'lucide-react';
 import { ClassroomContext } from '../hooks/ClassroomContext';
 import { Dashboard } from '../components/Dashboard';
 import { Scene3D } from '../components/Scene3D';
@@ -16,9 +16,38 @@ export function AppContentPage() {
     setSelectedClassroom
   } = useContext(ClassroomContext);
 
+  const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, []);
+
+  const handleFullscreen = async () => {
+    const sceneContainer = document.getElementById('scene-container');
+    
+    if (!isFullscreen && sceneContainer) {
+      try {
+        await sceneContainer.requestFullscreen();
+      } catch (error) {
+        console.error('Erreur lors du passage en plein écran:', error);
+      }
+    } else if (document.fullscreenElement) {
+      try {
+        await document.exitFullscreen();
+      } catch (error) {
+        console.error('Erreur lors de la sortie du plein écran:', error);
+      }
+    }
+  };
+
   const [activeTab, setActiveTab] = useState<'3d' | 'dashboard'>('3d');
   const navigate = useNavigate();
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
 
   function handleLogout() {
     navigate('/');
@@ -74,18 +103,35 @@ export function AppContentPage() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {activeTab === '3d' ? (
           <div className="space-y-8">
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-4">
               <div className="flex items-start space-x-3">
-                <Settings className="w-5 h-5 text-blue-600 mt-0.5" />
+                <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center">
+                  <span className="text-white text-sm font-semibold">
+                    {user?.name.charAt(0).toUpperCase()}
+                  </span>
+                </div>
                 <div>
-                  <h3 className="text-sm font-medium text-blue-900">Instructions</h3>
-                  <p className="text-sm text-blue-700 mt-1">
-                    Cliquez sur les salles de classe pour changer leur état (libre/occupé).
-                    Utilisez la souris pour naviguer dans la vue 3D.
+                  <h3 className="text-lg font-semibold text-slate-900">
+                    Bienvenue, {user?.name} !
+                  </h3>
+                  <p className="text-slate-600 mt-1">
+                    Cliquez sur les salles pour les sélectionner, double-cliquez pour changer leur état.
                   </p>
                 </div>
               </div>
             </div>
+
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="flex items-start space-x-3">
+                  <Settings className="w-5 h-5 text-blue-600 mt-0.5" />
+                  <div>
+                    <h3 className="text-sm font-medium text-blue-900">Instructions</h3>
+                    <p className="text-sm text-blue-700 mt-1">
+                      • Clic simple : Sélectionner une salle • Double-clic : Changer l'état (libre/occupé) • Utilisez les flèches pour déplacer la salle sélectionnée • La grille facilite le positionnement
+                    </p>
+                  </div>
+                </div>
+              </div>
 
             {selectedClassroom && (
               <div className="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
@@ -126,7 +172,32 @@ export function AppContentPage() {
               </div>
             )}
 
-            <Scene3D classrooms={classrooms} onToggleClassroom={toggleClassroom} />
+            <div className="relative">
+              <div 
+                id="scene-container"
+                className={`relative ${
+                  isFullscreen 
+                    ? 'fixed inset-0 z-50 bg-gradient-to-br from-slate-900 to-slate-800' 
+                    : 'w-full h-[500px] bg-gradient-to-br from-slate-900 to-slate-800 rounded-xl overflow-hidden shadow-2xl'
+                }`}
+              >
+                  <Scene3D classrooms={classrooms} onToggleClassroom={toggleClassroom} />
+
+                  <div className="absolute top-4 right-4 flex space-x-2">
+                  <button
+                    onClick={handleFullscreen}
+                    className="bg-white/90 backdrop-blur-sm hover:bg-white text-slate-700 p-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 group"
+                    title={isFullscreen ? "Quitter le plein écran" : "Plein écran"}
+                  >
+                    {isFullscreen ? (
+                      <Minimize className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                    ) : (
+                      <Maximize className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="bg-white p-4 rounded-lg shadow-sm border border-slate-200">

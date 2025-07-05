@@ -12,7 +12,7 @@ interface Scene3DProps {
 export const Scene3D: React.FC<Scene3DProps> = ({ classrooms }) => {
 
   return (
-    <div className="w-full h-[500px] bg-gradient-to-br from-slate-900 to-slate-800 rounded-xl overflow-hidden shadow-2xl">
+    <div className="w-full h-full">
       <Canvas
         camera={{ position: [12, 8, 12], fov: 60 }}
         shadows="soft"
