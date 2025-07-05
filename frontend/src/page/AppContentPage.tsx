@@ -1,11 +1,13 @@
 import { useContext, useEffect, useState } from 'react';
-import { Building2, BarChart3, Eye, Settings, LogOut, Minimize, Maximize } from 'lucide-react';
+import { Building2, BarChart3, Eye, Settings, LogOut, Minimize, Maximize, Plus } from 'lucide-react';
 import { ClassroomContext } from '../hooks/ClassroomContext';
 import { Dashboard } from '../components/Dashboard';
 import { Scene3D } from '../components/Scene3D';
+import { AddClassroomModal } from '../components/AddClassroomModal';
 import Logo from '../assets/Logo.png';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/AuthContext';
+import { ClassroomData } from '../types/classroom';
 
 export function AppContentPage() {
   const {
@@ -17,6 +19,7 @@ export function AppContentPage() {
   } = useContext(ClassroomContext);
 
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
+  const [showAddModal, setShowAddModal] = useState<boolean>(false);
 
   useEffect(() => {
     const handleFullscreenChange = () => {
@@ -53,6 +56,12 @@ export function AppContentPage() {
     navigate('/');
     logout();
   }
+
+  const handleAddClassroom = (classroom: Omit<ClassroomData, 'id'>) => {
+    // Add classroom logic here - you'll need to implement this in your context
+    console.log('Adding classroom:', classroom);
+    setShowAddModal(false);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
@@ -177,27 +186,37 @@ export function AppContentPage() {
                 id="scene-container"
                 className={`relative ${
                   isFullscreen 
-                    ? 'fixed inset-0 z-50 bg-gradient-to-br from-slate-900 to-slate-800' 
+                    ? 'fixed inset-0 z-50 bg-gradient-to-br from-slate-900 to-slate-800 h-screen w-screen' 
                     : 'w-full h-[500px] bg-gradient-to-br from-slate-900 to-slate-800 rounded-xl overflow-hidden shadow-2xl'
                 }`}
               >
-                  <Scene3D classrooms={classrooms} onToggleClassroom={toggleClassroom} />
+                  <Scene3D 
+                    classrooms={classrooms} 
+                    onToggleClassroom={toggleClassroom} 
+                  />
 
                   <div className="absolute top-4 right-4 flex space-x-2">
-                  <button
-                    onClick={handleFullscreen}
-                    className="bg-white/90 backdrop-blur-sm hover:bg-white text-slate-700 p-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 group"
-                    title={isFullscreen ? "Quitter le plein écran" : "Plein écran"}
-                  >
-                    {isFullscreen ? (
-                      <Minimize className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                    ) : (
-                      <Maximize className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                    )}
-                  </button>
+                    <button
+                      onClick={handleFullscreen}
+                      className="bg-white/90 backdrop-blur-sm hover:bg-white text-slate-700 p-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 group"
+                      title={isFullscreen ? "Quitter le plein écran" : "Plein écran"}
+                    >
+                      {isFullscreen ? (
+                        <Minimize className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                      ) : (
+                        <Maximize className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                      )}
+                    </button>
+                    <button
+                      onClick={() => setShowAddModal(true)}
+                      className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white p-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 group"
+                      title="Ajouter une classe"
+                    >
+                      <Plus className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
@@ -230,6 +249,14 @@ export function AppContentPage() {
           <Dashboard classrooms={classrooms} stats={stats} />
         )}
       </main>
+
+      {/* Modal d'ajout de classe */}
+      <AddClassroomModal
+        open={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        onAdd={handleAddClassroom}
+        classrooms={classrooms}
+      />
     </div>
   );
 }
