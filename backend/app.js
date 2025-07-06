@@ -9,13 +9,21 @@ const roleRoutes = require('./routes/role.route');
 const invitationRoutes = require('./routes/invitation.route');
 const { swaggerUi, swaggerSpec } = require('./docs/swagger');
 
-// Middleware JSON
+// Middlewares
 app.use(express.json());
 
-// Swagger docs
+// Route de welcome
+app.get('/', (req, res) => {
+    res.json({
+        message: 'Bienvenue sur Eduresa API',
+        docs: '/api/docs',
+    });
+});
+
+// Swagger
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-// API routes
+// Routes
 app.use('/api/users', userRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/rooms', roomRoutes);
