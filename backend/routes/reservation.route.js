@@ -2,14 +2,13 @@ const express = require('express');
 const router = express.Router();
 const controller = require('../controller/reservation.controller');
 const verifyToken = require('../middlewares/auth');
-
-router.use(verifyToken);
+const authorizeRoles = require('../middlewares/roles');
 
 /**
  * @swagger
  * tags:
  *   name: Reservations
- *   description: Gestion des réservations
+ *   description: Gestion des réservations de salles
  */
 
 /**
@@ -24,36 +23,35 @@ router.use(verifyToken);
  *       200:
  *         description: Liste des réservations
  */
-router.get('/', controller.getAllReservations);
+router.get('/', verifyToken, controller.getAllReservations);
 
 /**
  * @swagger
  * /reservations/{id}:
  *   get:
- *     summary: Récupérer une réservation par ID
+ *     summary: Obtenir une réservation par ID
  *     tags: [Reservations]
  *     security:
  *       - bearerAuth: []
  *     parameters:
- *       - in: path
- *         name: id
+ *       - name: id
+ *         in: path
  *         required: true
  *         schema:
- *           type: integer
- *         description: ID de la réservation
+ *           type: string
  *     responses:
  *       200:
  *         description: Détails de la réservation
- *       404:
- *         description: Réservation non trouvée
  */
-router.get('/:id', controller.getReservationById);
+router.get('/:id', verifyToken, controller.getReservationById);
+
+router.use(verifyToken, authorizeRoles('admin'));
 
 /**
  * @swagger
  * /reservations:
  *   post:
- *     summary: Créer une nouvelle réservation
+ *     summary: Créer une réservation
  *     tags: [Reservations]
  *     security:
  *       - bearerAuth: []
@@ -63,23 +61,29 @@ router.get('/:id', controller.getReservationById);
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - user
+ *               - room
+ *               - date
+ *               - startTime
+ *               - endTime
  *             properties:
- *               user_id:
- *                 type: integer
- *               room_id:
- *                 type: integer
+ *               user:
+ *                 type: string
+ *               room:
+ *                 type: string
  *               date:
  *                 type: string
  *                 format: date
- *               start_time:
+ *               startTime:
  *                 type: string
- *                 format: time
- *               end_time:
+ *                 example: "14:00"
+ *               endTime:
  *                 type: string
- *                 format: time
+ *                 example: "15:00"
  *     responses:
  *       201:
- *         description: Réservation créée avec succès
+ *         description: Réservation créée
  */
 router.post('/', controller.createReservation);
 
@@ -87,42 +91,35 @@ router.post('/', controller.createReservation);
  * @swagger
  * /reservations/{id}:
  *   put:
- *     summary: Mettre à jour une réservation existante
+ *     summary: Modifier une réservation
  *     tags: [Reservations]
  *     security:
  *       - bearerAuth: []
  *     parameters:
- *       - in: path
- *         name: id
+ *       - name: id
+ *         in: path
  *         required: true
  *         schema:
- *           type: integer
- *         description: ID de la réservation
+ *           type: string
  *     requestBody:
- *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
  *             properties:
- *               user_id:
- *                 type: integer
- *               room_id:
- *                 type: integer
+ *               user:
+ *                 type: string
+ *               room:
+ *                 type: string
  *               date:
  *                 type: string
- *                 format: date
- *               start_time:
+ *               startTime:
  *                 type: string
- *                 format: time
- *               end_time:
+ *               endTime:
  *                 type: string
- *                 format: time
  *     responses:
  *       200:
  *         description: Réservation mise à jour
- *       404:
- *         description: Réservation non trouvée
  */
 router.put('/:id', controller.updateReservation);
 
@@ -135,17 +132,14 @@ router.put('/:id', controller.updateReservation);
  *     security:
  *       - bearerAuth: []
  *     parameters:
- *       - in: path
- *         name: id
+ *       - name: id
+ *         in: path
  *         required: true
  *         schema:
- *           type: integer
- *         description: ID de la réservation
+ *           type: string
  *     responses:
  *       200:
  *         description: Réservation supprimée
- *       404:
- *         description: Réservation non trouvée
  */
 router.delete('/:id', controller.deleteReservation);
 

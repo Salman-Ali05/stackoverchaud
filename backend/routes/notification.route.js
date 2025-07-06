@@ -1,9 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const notifController = require('../controller/notification.controller');
+const controller = require('../controller/notification.controller');
 const verifyToken = require('../middlewares/auth');
-
-router.use(verifyToken);
+const authorizeRoles = require('../middlewares/roles');
 
 /**
  * @swagger
@@ -11,38 +10,6 @@ router.use(verifyToken);
  *   name: Notifications
  *   description: Gestion des notifications
  */
-
-/**
- * @swagger
- * /notifications:
- *   post:
- *     summary: Créer une nouvelle notification
- *     tags: [Notifications]
- *     security:
- *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               user_id:
- *                 type: integer
- *               content:
- *                 type: string
- *               sent_at:
- *                 type: string
- *                 format: date-time
- *               status:
- *                 type: string
- *               type:
- *                 type: string
- *     responses:
- *       201:
- *         description: Notification créée avec succès
- */
-router.post('/', notifController.createNotification);
 
 /**
  * @swagger
@@ -56,28 +23,61 @@ router.post('/', notifController.createNotification);
  *       200:
  *         description: Liste des notifications
  */
-router.get('/', notifController.getNotifications);
+router.get('/', verifyToken, controller.getAllNotifications);
 
 /**
  * @swagger
- * /notifications/user/{userId}:
+ * /notifications/{id}:
  *   get:
- *     summary: Récupérer les notifications d’un utilisateur
+ *     summary: Obtenir une notification par ID
  *     tags: [Notifications]
  *     security:
  *       - bearerAuth: []
  *     parameters:
- *       - in: path
- *         name: userId
+ *       - name: id
+ *         in: path
  *         required: true
  *         schema:
- *           type: integer
- *         description: ID de l'utilisateur
+ *           type: string
  *     responses:
  *       200:
- *         description: Notifications de l’utilisateur
+ *         description: Détails de la notification
  */
-router.get('/user/:userId', notifController.getNotificationsByUser);
+router.get('/:id', verifyToken, controller.getNotificationById);
+
+router.use(verifyToken, authorizeRoles('admin'));
+
+/**
+ * @swagger
+ * /notifications:
+ *   post:
+ *     summary: Créer une notification
+ *     tags: [Notifications]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [user, content]
+ *             properties:
+ *               user:
+ *                 type: string
+ *               content:
+ *                 type: string
+ *               status:
+ *                 type: string
+ *                 enum: [lu, non_lu]
+ *               type:
+ *                 type: string
+ *                 enum: [info, alerte, reservation]
+ *     responses:
+ *       201:
+ *         description: Notification créée
+ */
+router.post('/', controller.createNotification);
 
 /**
  * @swagger
@@ -88,16 +88,15 @@ router.get('/user/:userId', notifController.getNotificationsByUser);
  *     security:
  *       - bearerAuth: []
  *     parameters:
- *       - in: path
- *         name: id
+ *       - name: id
+ *         in: path
  *         required: true
  *         schema:
- *           type: integer
- *         description: ID de la notification
+ *           type: string
  *     responses:
  *       200:
  *         description: Notification supprimée
  */
-router.delete('/:id', notifController.deleteNotification);
+router.delete('/:id', controller.deleteNotification);
 
 module.exports = router;

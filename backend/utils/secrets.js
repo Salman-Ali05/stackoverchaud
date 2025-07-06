@@ -1,31 +1,25 @@
-require('dotenv/config');
+require('dotenv').config();
 
 const {
-    DB_HOST,
-    DB_USER,
-    DB_PASS,
-    DB_NAME,
+    PORT,
+    MONGO_URI,
     JWT_SECRET_KEY
 } = process.env;
 
-const requiredCredentials = [
-    'DB_HOST',
-    'DB_USER',
-    'DB_PASS',
-    'DB_NAME',
-    'JWT_SECRET_KEY'
-];
+const requiredCredentials = {
+    MONGO_URI,
+    JWT_SECRET_KEY
+};
 
-// for (const credential of requiredCredentials) {
-//     if (process.env[credential] === undefined) {
-//         process.exit(1);
-//     }
-// }
+for (const [key, value] of Object.entries(requiredCredentials)) {
+    if (!value) {
+        console.error(`❌ Missing required environment variable: ${key}`);
+        process.exit(1);
+    }
+}
 
 module.exports = {
-    DB_HOST,
-    DB_USER,
-    DB_PASS,
-    DB_NAME,
+    PORT: PORT || 5000,
+    MONGO_URI,
     JWT_SECRET_KEY
 };

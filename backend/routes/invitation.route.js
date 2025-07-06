@@ -1,19 +1,51 @@
 const express = require('express');
 const router = express.Router();
 const controller = require('../controller/invitation.controller');
+const verifyToken = require('../middlewares/auth');
+const authorizeRoles = require('../middlewares/roles');
 
+router.use(verifyToken);
+router.use(authorizeRoles('admin'));
 /**
  * @swagger
  * tags:
  *   name: Invitations
- *   description: Gestion des invitations
+ *   description: Gestion des invitations d'inscription
+ */
+
+/**
+ * @swagger
+ * /invitations:
+ *   get:
+ *     summary: Récupérer toutes les invitations
+ *     tags: [Invitations]
+ *     responses:
+ *       200:
+ *         description: Liste des invitations
+ */
+
+/**
+ * @swagger
+ * /invitations/{id}:
+ *   get:
+ *     summary: Obtenir une invitation par ID
+ *     tags: [Invitations]
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Détails de l'invitation
  */
 
 /**
  * @swagger
  * /invitations:
  *   post:
- *     summary: Créer une invitation
+ *     summary: Créer une nouvelle invitation
  *     tags: [Invitations]
  *     requestBody:
  *       required: true
@@ -21,55 +53,35 @@ const controller = require('../controller/invitation.controller');
  *         application/json:
  *           schema:
  *             type: object
+ *             required: [email]
  *             properties:
  *               email:
  *                 type: string
  *     responses:
  *       201:
  *         description: Invitation créée
- *       400:
- *         description: Email requis
  */
 
 /**
  * @swagger
- * /invitations/{token}:
- *   get:
- *     summary: Valider un token d'invitation
+ * /invitations/{id}:
+ *   delete:
+ *     summary: Supprimer une invitation
  *     tags: [Invitations]
  *     parameters:
- *       - in: path
- *         name: token
+ *       - name: id
+ *         in: path
  *         required: true
  *         schema:
  *           type: string
  *     responses:
  *       200:
- *         description: Invitation trouvée
- *       404:
- *         description: Token non trouvé
- *       410:
- *         description: Token déjà utilisé
+ *         description: Invitation supprimée
  */
 
-/**
- * @swagger
- * /invitations/{token}/use:
- *   patch:
- *     summary: Marquer une invitation comme utilisée
- *     tags: [Invitations]
- *     parameters:
- *       - in: path
- *         name: token
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: Token marqué comme utilisé
- */
 router.post('/', controller.createInvitation);
-router.get('/:token', controller.validateToken);
-router.patch('/:token/use', controller.useToken);
+router.get('/', controller.getAllInvitations);
+router.get('/:id', controller.getInvitationById);
+router.delete('/:id', controller.deleteInvitation);
 
 module.exports = router;

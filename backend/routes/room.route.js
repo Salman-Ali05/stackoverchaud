@@ -1,10 +1,3 @@
-const express = require('express');
-const router = express.Router();
-const controller = require('../controller/room.controller');
-const verifyToken = require('../middlewares/auth');
-
-router.use(verifyToken);
-
 /**
  * @swagger
  * tags:
@@ -16,38 +9,31 @@ router.use(verifyToken);
  * @swagger
  * /rooms:
  *   get:
- *     summary: Récupérer toutes les salles
+ *     summary: Liste de toutes les salles
  *     tags: [Rooms]
- *     security:
- *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: Liste des salles
+ *         description: Succès
  */
-router.get('/', controller.getAllRooms);
 
 /**
  * @swagger
  * /rooms/{id}:
  *   get:
- *     summary: Récupérer une salle par ID
+ *     summary: Obtenir une salle par ID
  *     tags: [Rooms]
- *     security:
- *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
  *         schema:
- *           type: integer
- *         description: ID de la salle
+ *           type: string
  *     responses:
  *       200:
- *         description: Données de la salle
+ *         description: Détails de la salle
  *       404:
  *         description: Salle non trouvée
  */
-router.get('/:id', controller.getRoomById);
 
 /**
  * @swagger
@@ -55,8 +41,6 @@ router.get('/:id', controller.getRoomById);
  *   post:
  *     summary: Créer une nouvelle salle
  *     tags: [Rooms]
- *     security:
- *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -67,58 +51,41 @@ router.get('/:id', controller.getRoomById);
  *               name:
  *                 type: string
  *               capacity:
- *                 type: integer
+ *                 type: number
  *               type:
  *                 type: string
- *               accessible_to_students:
+ *               reserved:
  *                 type: boolean
- *               floor_id:
- *                 type: integer
+ *               floor:
+ *                 type: number
  *     responses:
  *       201:
- *         description: Salle créée avec succès
+ *         description: Salle créée
+ *       400:
+ *         description: Données invalides
  */
-router.post('/', controller.createRoom);
 
 /**
  * @swagger
  * /rooms/{id}:
  *   put:
- *     summary: Mettre à jour une salle existante
+ *     summary: Modifier une salle
  *     tags: [Rooms]
- *     security:
- *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
- *         required: true
  *         schema:
- *           type: integer
- *         description: ID de la salle
+ *           type: string
+ *         required: true
  *     requestBody:
- *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
- *             properties:
- *               name:
- *                 type: string
- *               capacity:
- *                 type: integer
- *               type:
- *                 type: string
- *               accessible_to_students:
- *                 type: boolean
- *               floor_id:
- *                 type: integer
  *     responses:
  *       200:
- *         description: Salle mise à jour avec succès
- *       404:
- *         description: Salle non trouvée
+ *         description: Salle mise à jour
  */
-router.put('/:id', controller.updateRoom);
 
 /**
  * @swagger
@@ -126,21 +93,28 @@ router.put('/:id', controller.updateRoom);
  *   delete:
  *     summary: Supprimer une salle
  *     tags: [Rooms]
- *     security:
- *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
  *         schema:
- *           type: integer
- *         description: ID de la salle
+ *           type: string
  *     responses:
  *       200:
- *         description: Salle supprimée avec succès
- *       404:
- *         description: Salle non trouvée
+ *         description: Salle supprimée
  */
+
+const express = require('express');
+const router = express.Router();
+const controller = require('../controller/room.controller');
+const verifyToken = require('../middlewares/auth');
+
+router.use(verifyToken);
+router.get('/', controller.getAllRooms);
+
+router.get('/:id', controller.getRoomById);
+router.post('/', controller.createRoom);
+router.put('/:id', controller.updateRoom);
 router.delete('/:id', controller.deleteRoom);
 
 module.exports = router;

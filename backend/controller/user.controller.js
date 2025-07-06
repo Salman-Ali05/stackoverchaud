@@ -1,8 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user.model');
-// const Role = require('../models/role.model');
-// const Invitation = require('../models/invitation.model');
+const Invitation = require('../models/invitation.model');
 const { JWT_SECRET_KEY } = require('../utils/secrets');
 
 exports.createUser = async (req, res) => {
@@ -13,6 +12,21 @@ exports.createUser = async (req, res) => {
   }
 
   try {
+    let invitationDoc = null;
+
+    if (invitation) {
+      invitationDoc = await Invitation.findById(invitation);
+      if (!invitationDoc) {
+        return res.status(404).json({ status: 'error', message: 'Invitation not found' });
+      }
+      if (invitationDoc.used) {
+        return res.status(400).json({ status: 'error', message: 'Invitation already used' });
+      }
+
+      invitationDoc.used = true;
+      await invitationDoc.save();
+    }
+
     const hashedPassword = await bcrypt.hash(password.trim(), 10);
 
     const user = new User({
@@ -20,8 +34,8 @@ exports.createUser = async (req, res) => {
       lastName: lastName.trim(),
       email: email.trim(),
       password: hashedPassword,
-      role : role || null,
-      invitation: invitation || null
+      role,
+      invitation: invitationDoc ? invitationDoc._id : null
     });
 
     const savedUser = await user.save();
@@ -46,7 +60,15 @@ exports.login = async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(401).json({ status: 'error', message: 'Invalid password' });
 
-    const token = jwt.sign({ id: user._id, role: user.role.name }, JWT_SECRET_KEY, { expiresIn: '24h' });
+    if (!user.role) {
+      return res.status(500).json({ status: 'error', message: 'User has no role assigned' });
+    }
+
+    const token = jwt.sign(
+      { id: user._id, role: user.role?.name || 'unknown' },
+      JWT_SECRET_KEY,
+      { expiresIn: '24h' }
+    );
 
     res.status(200).json({
       status: 'success',
@@ -57,7 +79,7 @@ exports.login = async (req, res) => {
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
-        role: user.role.name
+        role: user.role?.name || null
       }
     });
   } catch (err) {
