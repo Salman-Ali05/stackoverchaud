@@ -34,7 +34,7 @@ Créer un fichier `.env` à la racine du dossier `backend` :
 ```env
 PORT=5000
 MONGO_URI=mongodb+srv://<user>:<pass>@cluster.mongodb.net/eduresa
-JWT_SECRET_KEY=un_secret_puissant
+JWT_SECRET_KEY=StackOverChaudSecretKey!2025
 ```
 
 ## 🧪 Installation & Lancement
