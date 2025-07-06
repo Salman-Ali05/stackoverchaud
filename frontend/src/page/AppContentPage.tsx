@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from 'react';
-import { Building2, BarChart3, Eye, Settings, LogOut, Minimize, Maximize, Plus } from 'lucide-react';
+import { BarChart3, Eye, Settings, LogOut, Minimize, Maximize, Plus, Trash2 } from 'lucide-react';
 import { ClassroomContext } from '../hooks/ClassroomContext';
 import { Dashboard } from '../components/Dashboard';
 import { Scene3D } from '../components/Scene3D';
@@ -15,7 +15,8 @@ export function AppContentPage() {
     stats,
     classrooms,
     selectedClassroom,
-    setSelectedClassroom
+    setSelectedClassroom,
+    removeClassroom
   } = useContext(ClassroomContext);
 
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
@@ -58,9 +59,15 @@ export function AppContentPage() {
   }
 
   const handleAddClassroom = (classroom: Omit<ClassroomData, 'id'>) => {
-    // Add classroom logic here - you'll need to implement this in your context
     console.log('Adding classroom:', classroom);
     setShowAddModal(false);
+  };
+
+  const handleDeleteClassroom = () => {
+    if (selectedClassroom) {
+      removeClassroom(selectedClassroom.id);
+      setSelectedClassroom(null);
+    }
   };
 
   return (
@@ -191,8 +198,8 @@ export function AppContentPage() {
                 }`}
               >
                   <Scene3D 
-                    classrooms={classrooms} 
-                    onToggleClassroom={toggleClassroom} 
+                    classrooms={classrooms}
+                    onToggleClassroom={toggleClassroom}
                   />
 
                   <div className="absolute top-4 right-4 flex space-x-2">
@@ -215,6 +222,17 @@ export function AppContentPage() {
                       <Plus className="w-5 h-5 group-hover:scale-110 transition-transform" />
                     </button>
                   </div>
+                  {selectedClassroom && (
+                    <div className="absolute bottom-4 right-4">
+                      <button
+                        onClick={handleDeleteClassroom}
+                        className="bg-red-600 hover:bg-red-700 text-white p-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 group"
+                        title={`Supprimer la salle ${selectedClassroom?.letter}`}
+                      >
+                        <Trash2 className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
 

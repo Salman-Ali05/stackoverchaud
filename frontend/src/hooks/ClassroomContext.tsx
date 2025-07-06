@@ -59,6 +59,7 @@ interface ClassroomContextProps {
   setSelectedClassroom: (c: ClassroomData | null) => void;
   toggleClassroom: (id: string) => void;
   stats: ClassroomStats;
+  removeClassroom: (id: string) => void;
 }
 
 export const ClassroomContext = createContext<ClassroomContextProps>({
@@ -73,6 +74,7 @@ export const ClassroomContext = createContext<ClassroomContextProps>({
     available: 0,
     occupancyRate: 0,
   },
+  removeClassroom: () => {},
 });
 
 export const ClassroomProvider = ({ children }: { children: ReactNode }) => {
@@ -95,6 +97,10 @@ export const ClassroomProvider = ({ children }: { children: ReactNode }) => {
     return { total, occupied, available, occupancyRate };
   }, [classrooms]);
 
+    const removeClassroom = (id: string) => {
+      setClassrooms(prev => prev.filter(classroom => classroom.id !== id));
+    };
+
   return (
     <ClassroomContext.Provider
       value={{
@@ -104,6 +110,7 @@ export const ClassroomProvider = ({ children }: { children: ReactNode }) => {
         setSelectedClassroom,
         toggleClassroom,
         stats,
+        removeClassroom,
       }}
     >
       {children}
