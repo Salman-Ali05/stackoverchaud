@@ -1,38 +1,50 @@
 const Room = require('../models/room.model');
 
-exports.createRoom = (req, res) => {
-  Room.create(req.body, (err, result) => {
-    if (err) return res.status(500).json({ status: 'error', message: err.message });
-    res.status(201).json({ status: 'success', message: 'Room created', data: result });
-  });
+exports.createRoom = async (req, res) => {
+  try {
+    const newRoom = new Room(req.body);
+    const saved = await newRoom.save();
+    res.status(201).json({ status: 'success', data: saved });
+  } catch (err) {
+    res.status(400).json({ status: 'error', message: err.message });
+  }
 };
 
-exports.getAllRooms = (req, res) => {
-  Room.findAll((err, results) => {
-    if (err) return res.status(500).json({ status: 'error', message: err.message });
-    res.status(200).json({ status: 'success', data: results });
-  });
+exports.getAllRooms = async (_req, res) => {
+  try {
+    const rooms = await Room.find();
+    res.status(200).json({ status: 'success', data: rooms });
+  } catch (err) {
+    res.status(500).json({ status: 'error', message: err.message });
+  }
 };
 
-exports.getRoomById = (req, res) => {
-  Room.findById(req.params.id, (err, results) => {
-    if (err) return res.status(500).json({ status: 'error', message: err.message });
-    if (!results.length) return res.status(404).json({ status: 'error', message: 'Room not found' });
-    res.status(200).json({ status: 'success', data: results[0] });
-  });
+exports.getRoomById = async (req, res) => {
+  try {
+    const room = await Room.findById(req.params.id);
+    if (!room) return res.status(404).json({ status: 'error', message: 'Room not found' });
+    res.status(200).json({ status: 'success', data: room });
+  } catch (err) {
+    res.status(500).json({ status: 'error', message: err.message });
+  }
 };
 
-exports.updateRoom = (req, res) => {
-  Room.update(req.params.id, req.body, (err, result) => {
-    if (err) return res.status(500).json({ status: 'error', message: err.message });
-    res.status(200).json({ status: 'success', message: 'Room updated' });
-  });
+exports.updateRoom = async (req, res) => {
+  try {
+    const updated = await Room.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!updated) return res.status(404).json({ status: 'error', message: 'Room not found' });
+    res.status(200).json({ status: 'success', data: updated });
+  } catch (err) {
+    res.status(400).json({ status: 'error', message: err.message });
+  }
 };
 
-exports.deleteRoom = (req, res) => {
-  Room.delete(req.params.id, (err, result) => {
-    if (err) return res.status(500).json({ status: 'error', message: err.message });
+exports.deleteRoom = async (req, res) => {
+  try {
+    const deleted = await Room.findByIdAndDelete(req.params.id);
+    if (!deleted) return res.status(404).json({ status: 'error', message: 'Room not found' });
     res.status(200).json({ status: 'success', message: 'Room deleted' });
-  });
+  } catch (err) {
+    res.status(500).json({ status: 'error', message: err.message });
+  }
 };
- 

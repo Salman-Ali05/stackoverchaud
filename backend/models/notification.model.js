@@ -1,32 +1,29 @@
-const db = require('../config/db.config.init');
+const mongoose = require('mongoose');
 
-const Notification = {
-  create: (notification, callback) => {
-    const query = `
-      INSERT INTO notifications (user_id, content, sent_at, status, type)
-      VALUES (?, ?, ?, ?, ?)
-    `;
-    const values = [
-      notification.user_id,
-      notification.content,
-      notification.sent_at,
-      notification.status,
-      notification.type
-    ];
-    db.query(query, values, callback);
-  },
+const notificationSchema = new mongoose.Schema({
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
+    content: {
+        type: String,
+        required: true
+    },
+    sentAt: {
+        type: Date,
+        default: Date.now
+    },
+    status: {
+        type: String,
+        enum: ['lu', 'non_lu'],
+        default: 'non_lu'
+    },
+    type: {
+        type: String,
+        enum: ['info', 'alerte', 'reservation'],
+        default: 'info'
+    }
+}, { timestamps: true });
 
-  getAll: (callback) => {
-    db.query('SELECT * FROM notifications', callback);
-  },
-
-  getByUserId: (user_id, callback) => {
-    db.query('SELECT * FROM notifications WHERE user_id = ?', [user_id], callback);
-  },
-
-  delete: (id, callback) => {
-    db.query('DELETE FROM notifications WHERE id = ?', [id], callback);
-  }
-};
-
-module.exports = Notification;
+module.exports = mongoose.model('Notification', notificationSchema);

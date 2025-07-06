@@ -1,13 +1,8 @@
-/**
- * @swagger
- * /users:
- *   get:
- *     summary: Récupérer tous les utilisateurs
- *     tags: [Users]
- *     responses:
- *       200:
- *         description: Liste des utilisateurs
- */
+const express = require('express');
+const router = express.Router();
+const controller = require('../controller/user.controller');
+const verifyToken = require('../middlewares/auth');
+const authorizeRoles = require('../middlewares/roles');
 
 /**
  * @swagger
@@ -15,6 +10,78 @@
  *   name: Users
  *   description: Gestion des utilisateurs
  */
+
+/**
+ * @swagger
+ * /users:
+ *   get:
+ *     summary: Récupérer tous les utilisateurs
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Liste des utilisateurs
+ */
+router.get('/', verifyToken, controller.getAllUsers);
+
+/**
+ * @swagger
+ * /users/{id}:
+ *   get:
+ *     summary: Obtenir un utilisateur par ID
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Détails de l'utilisateur
+ */
+router.get('/:id', verifyToken, controller.getUserById);
+
+/**
+ * @swagger
+ * /users:
+ *   post:
+ *     summary: Créer un utilisateur
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - firstName
+ *               - lastName
+ *               - email
+ *               - password
+ *               - role
+ *             properties:
+ *               firstName:
+ *                 type: string
+ *               lastName:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *               role:
+ *                 type: string
+ *               invitation:
+ *                 type: string
+ *                 nullable: true
+ *     responses:
+ *       201:
+ *         description: Utilisateur créé
+ */
+router.post('/', controller.createUser);
 
 /**
  * @swagger
@@ -35,27 +102,38 @@
  *                 type: string
  *     responses:
  *       200:
- *         description: Connexion réussie, retourne un token
- *       400:
- *         description: Email ou mot de passe manquant
+ *         description: Connexion réussie
  *       401:
- *         description: Mot de passe invalide
- *       404:
- *         description: Utilisateur non trouvé
+ *         description: Identifiants invalides
  */
+router.post('/login', controller.login);
+
+router.use(verifyToken, authorizeRoles("admin"));
 
 /**
  * @swagger
- * /users:
- *   post:
- *     summary: Créer un nouvel utilisateur
+ * /users/{id}:
+ *   put:
+ *     summary: Modifier un utilisateur
  *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
  *     requestBody:
- *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - firstName
+ *               - lastName
+ *               - email
+ *               - role
  *             properties:
  *               firstName:
  *                 type: string
@@ -65,91 +143,17 @@
  *                 type: string
  *               password:
  *                 type: string
+ *                 nullable: true
  *               role:
  *                 type: string
- *                 enum: [admin, manager, teacher, student]
- *     responses:
- *       201:
- *         description: Utilisateur créé
- *       400:
- *         description: Champs requis manquants
- *       500:
- *         description: Erreur serveur
- */
-
-/**
- * @swagger
- * /users:
- *   get:
- *     summary: Récupérer tous les utilisateurs
- *     tags: [Users]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: Liste des utilisateurs
- *       401:
- *         description: Token requis
- */
-
-/**
- * @swagger
- * /users/{id}:
- *   get:
- *     summary: Récupérer un utilisateur par ID
- *     tags: [Users]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         schema:
- *           type: integer
- *         required: true
- *         description: ID de l'utilisateur
- *     responses:
- *       200:
- *         description: Détails de l'utilisateur
- *       404:
- *         description: Utilisateur non trouvé
- */
-
-/**
- * @swagger
- * /users/{id}:
- *   put:
- *     summary: Mettre à jour un utilisateur
- *     tags: [Users]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         schema:
- *           type: integer
- *         required: true
- *         description: ID de l'utilisateur
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               firstName:
+ *               invitation:
  *                 type: string
- *               lastName:
- *                 type: string
- *               email:
- *                 type: string
- *               role:
- *                 type: string
+ *                 nullable: true
  *     responses:
  *       200:
  *         description: Utilisateur mis à jour
- *       404:
- *         description: Utilisateur non trouvé
  */
+router.put('/:id', controller.updateUser);
 
 /**
  * @swagger
@@ -160,36 +164,15 @@
  *     security:
  *       - bearerAuth: []
  *     parameters:
- *       - in: path
- *         name: id
- *         schema:
- *           type: integer
+ *       - name: id
+ *         in: path
  *         required: true
- *         description: ID de l'utilisateur
+ *         schema:
+ *           type: string
  *     responses:
  *       200:
  *         description: Utilisateur supprimé
- *       403:
- *         description: Accès interdit (admin uniquement)
- *       404:
- *         description: Utilisateur non trouvé
  */
-
-
-
-const express = require('express');
-const router = express.Router();
-const userController = require('../controller/user.controller');
-const verifyToken = require('../middlewares/auth');
-const authorizeRoles = require('../middlewares/roles');
-
-router.post('/login', userController.login);
-router.post('/', userController.createUser);
-
-router.use(verifyToken);
-router.get('/', userController.getAllUsers);
-router.get('/:id', userController.getUserById);
-router.put('/:id', userController.updateUser);
-router.delete('/:id', authorizeRoles("admin"), userController.deleteUser);
+router.delete('/:id', controller.deleteUser);
 
 module.exports = router;

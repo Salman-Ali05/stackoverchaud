@@ -1,34 +1,28 @@
-const db = require('../config/db.config.init');
+const mongoose = require('mongoose');
 
-const Reservation = {
-  create: (data, cb) => {
-    const query = `
-      INSERT INTO reservations (user_id, room_id, date, start_time, end_time)
-      VALUES (?, ?, ?, ?, ?)
-    `;
-    db.query(query, [data.user_id, data.room_id, data.date, data.start_time, data.end_time], cb);
-  },
+const reservationSchema = new mongoose.Schema({
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
+    room: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Room',
+        required: true
+    },
+    date: {
+        type: Date,
+        required: true
+    },
+    startTime: {
+        type: String, // Format HH:mm
+        required: true
+    },
+    endTime: {
+        type: String, // Format HH:mm
+        required: true
+    }
+}, { timestamps: true });
 
-  findAll: (cb) => {
-    db.query('SELECT * FROM reservations', cb);
-  },
-
-  findById: (id, cb) => {
-    db.query('SELECT * FROM reservations WHERE id = ?', [id], cb);
-  },
-
-  update: (id, data, cb) => {
-    const query = `
-      UPDATE reservations 
-      SET user_id = ?, room_id = ?, date = ?, start_time = ?, end_time = ?
-      WHERE id = ?
-    `;
-    db.query(query, [data.user_id, data.room_id, data.date, data.start_time, data.end_time, id], cb);
-  },
-
-  delete: (id, cb) => {
-    db.query('DELETE FROM reservations WHERE id = ?', [id], cb);
-  }
-};
-
-module.exports = Reservation;
+module.exports = mongoose.model('Reservation', reservationSchema);
