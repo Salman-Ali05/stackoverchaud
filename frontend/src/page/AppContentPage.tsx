@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from 'react';
-import { BarChart3, Eye, Settings, LogOut, Minimize, Maximize, Plus, Trash2 } from 'lucide-react';
+import { BarChart3, Eye, Settings, LogOut, Minimize, Maximize, Plus, Trash2, ArrowLeft, ArrowRight } from 'lucide-react';
 import { ClassroomContext } from '../hooks/ClassroomContext';
 import { Dashboard } from '../components/Dashboard';
 import { Scene3D } from '../components/Scene3D';
@@ -8,6 +8,7 @@ import Logo from '../assets/Logo.png';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/AuthContext';
 import { ClassroomData } from '../types/classroom';
+import { useToast, ToastProvider } from '../hooks/useToast';
 
 export function AppContentPage() {
   const {
@@ -16,7 +17,9 @@ export function AppContentPage() {
     classrooms,
     selectedClassroom,
     setSelectedClassroom,
-    removeClassroom
+    removeClassroom,
+    addClassroom,
+    moveClassroom,
   } = useContext(ClassroomContext);
 
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
@@ -52,6 +55,7 @@ export function AppContentPage() {
   const [activeTab, setActiveTab] = useState<'3d' | 'dashboard'>('3d');
   const navigate = useNavigate();
   const { logout, user } = useAuth();
+  const { showError } = useToast();
 
   function handleLogout() {
     navigate('/');
@@ -59,7 +63,19 @@ export function AppContentPage() {
   }
 
   const handleAddClassroom = (classroom: Omit<ClassroomData, 'id'>) => {
-    console.log('Adding classroom:', classroom);
+    const [x, , z] = classroom.position;
+    
+    // Vérifier si la position est dans les limites de la scène
+    if (x < -12.5 || x > 12.5 || z < -7.5 || z > 7.5) {
+      showError('La position de la salle doit être dans les limites de la scène (X: -12.5 à 12.5, Z: -7.5 à 7.5)');
+      return;
+    }
+    
+    const newClassroom: ClassroomData = {
+      ...classroom,
+      id: (classrooms.length + 1).toString(),
+    };
+    addClassroom(newClassroom);
     setShowAddModal(false);
   };
 
@@ -67,6 +83,69 @@ export function AppContentPage() {
     if (selectedClassroom) {
       removeClassroom(selectedClassroom.id);
       setSelectedClassroom(null);
+    }
+  };
+
+   const canMove = (direction: 'up' | 'down' | 'left' | 'right') => {
+    if (!selectedClassroom) return false;
+
+    const classroom = classrooms.find(c => c.id === selectedClassroom?.id);
+    if (!classroom) return false;
+
+    const [x, y, z] = classroom.position;
+    let newX = x, newY = y, newZ = z;
+
+    switch (direction) {
+      case 'up':
+        newZ -= 3;
+        break;
+      case 'down':
+        newZ += 3;
+        break;
+      case 'left':
+        newX -= 3;
+        break;
+      case 'right':
+        newX += 3;
+        break;
+    }
+
+    if (newX < -12.5 || newX > 12.5 || newZ < -7.5 || newZ > 7.5) {
+      return false;
+    } else {
+      return true;
+    }
+  };
+
+  const moveSelectedClassroom = (direction: 'up' | 'down' | 'left' | 'right') => {
+    if (!selectedClassroom) return;
+
+    const classroom = classrooms.find(c => c.id === selectedClassroom?.id);
+    if (!classroom) return;
+
+    const [x, y, z] = classroom.position;
+    let newX = x, newY = y, newZ = z;
+
+    switch (direction) {
+      case 'up':
+        newZ -= 3;
+        break;
+      case 'down':
+        newZ += 3;
+        break;
+      case 'left':
+        newX -= 3;
+        break;
+      case 'right':
+        newX += 3;
+        break;
+    }
+
+    // Vérifier si la nouvelle position est dans les limites et libre
+    if (newX < -12.5 || newX > 12.5 || newZ < -7.5 || newZ > 7.5) {
+      return;
+    } else {
+      moveClassroom(classroom.id, [newX, y, newZ]);
     }
   };
 
@@ -233,6 +312,34 @@ export function AppContentPage() {
                       </button>
                     </div>
                   )}
+                  {selectedClassroom && (
+                    <div className='absolute bottom-4 left-4 flex items-center space-x-4'>
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={() => moveSelectedClassroom('left')}
+                          disabled={!canMove('left')}
+                          className="bg-white/90 backdrop-blur-sm hover:bg-white text-slate-700 p-2 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 group disabled:opacity-50 disabled:cursor-not-allowed"
+                          title="Vers la gauche (X-)"
+                        >
+                          <ArrowLeft className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                        </button>
+                        
+                        <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-2 rounded-lg shadow-lg flex items-center justify-center min-w-[32px] min-h-[32px]">
+                          <span className="text-sm font-bold">{selectedClassroom?.letter}</span>
+                        </div>
+                        
+                        <button
+                          onClick={() => moveSelectedClassroom('right')}
+                          disabled={!canMove('right')}
+                          className="bg-white/90 backdrop-blur-sm hover:bg-white text-slate-700 p-2 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 group disabled:opacity-50 disabled:cursor-not-allowed"
+                          title="Vers la droite (X+)"
+                        >
+                          <ArrowRight className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
                 </div>
               </div>
 
@@ -268,13 +375,14 @@ export function AppContentPage() {
         )}
       </main>
 
-      {/* Modal d'ajout de classe */}
       <AddClassroomModal
         open={showAddModal}
         onClose={() => setShowAddModal(false)}
         onAdd={handleAddClassroom}
         classrooms={classrooms}
       />
+      
+      <ToastProvider />
     </div>
   );
 }
