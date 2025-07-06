@@ -60,6 +60,8 @@ interface ClassroomContextProps {
   toggleClassroom: (id: string) => void;
   stats: ClassroomStats;
   removeClassroom: (id: string) => void;
+  addClassroom: (newClassroom: Omit<ClassroomData, 'id'>) => void;
+  moveClassroom: (id: string, newPosition: [number, number, number]) => void;
 }
 
 export const ClassroomContext = createContext<ClassroomContextProps>({
@@ -75,6 +77,8 @@ export const ClassroomContext = createContext<ClassroomContextProps>({
     occupancyRate: 0,
   },
   removeClassroom: () => {},
+  addClassroom: () => {},
+  moveClassroom: () => {},
 });
 
 export const ClassroomProvider = ({ children }: { children: ReactNode }) => {
@@ -89,6 +93,15 @@ export const ClassroomProvider = ({ children }: { children: ReactNode }) => {
     );
   };
 
+  const addClassroom = (newClassroom: Omit<ClassroomData, 'id'>) => {
+    const id = (classrooms.length + 1).toString();
+    const classroom: ClassroomData = {
+      ...newClassroom,
+      id,
+    };
+    setClassrooms(prev => [...prev, classroom]);
+  };
+
   const stats: ClassroomStats = useMemo(() => {
     const total = classrooms.length;
     const occupied = classrooms.filter(c => c.isOccupied).length;
@@ -97,9 +110,19 @@ export const ClassroomProvider = ({ children }: { children: ReactNode }) => {
     return { total, occupied, available, occupancyRate };
   }, [classrooms]);
 
-    const removeClassroom = (id: string) => {
-      setClassrooms(prev => prev.filter(classroom => classroom.id !== id));
-    };
+  const removeClassroom = (id: string) => {
+    setClassrooms(prev => prev.filter(classroom => classroom.id !== id));
+  };
+
+  const moveClassroom = (id: string, newPosition: [number, number, number]) => {
+    setClassrooms(prev =>
+      prev.map(classroom =>
+        classroom.id === id
+          ? { ...classroom, position: newPosition }
+          : classroom
+      )
+    );
+  };
 
   return (
     <ClassroomContext.Provider
@@ -111,6 +134,8 @@ export const ClassroomProvider = ({ children }: { children: ReactNode }) => {
         toggleClassroom,
         stats,
         removeClassroom,
+        addClassroom,
+        moveClassroom,
       }}
     >
       {children}

@@ -18,11 +18,9 @@ export const Classroom: React.FC<ClassroomProps> = ({ classroom }) => {
 
   useFrame((state) => {
     if (groupRef.current) {
-      // Animation subtile de hover
       groupRef.current.scale.setScalar(hovered ? 1.02 : 1);
     }
     
-    // Animation flottante pour la lettre
     if (letterRef.current) {
       letterRef.current.position.y = 2.5 + Math.sin(state.clock.elapsedTime * 2) * 0.1;
     }
@@ -52,7 +50,6 @@ export const Classroom: React.FC<ClassroomProps> = ({ classroom }) => {
       onPointerOver={() => setHovered(true)}
       onPointerOut={() => setHovered(false)}
     >
-      {/* Sol de la salle avec ombres optimisées */}
       <mesh position={[0, -0.05, 0]} receiveShadow>
         <boxGeometry args={[4, 0.1, 3]} />
         <meshStandardMaterial 
@@ -62,9 +59,7 @@ export const Classroom: React.FC<ClassroomProps> = ({ classroom }) => {
         />
       </mesh>
 
-      {/* Murs transparents pour délimiter la salle */}
       <group>
-        {/* Mur arrière */}
         <mesh position={[0, 1, -1.5]} castShadow>
           <boxGeometry args={[4, 2, 0.1]} />
           <meshStandardMaterial 
@@ -75,7 +70,6 @@ export const Classroom: React.FC<ClassroomProps> = ({ classroom }) => {
           />
         </mesh>
         
-        {/* Murs latéraux */}
         <mesh position={[-2, 1, 0]}>
           <boxGeometry args={[0.1, 2, 3]} />
           <meshStandardMaterial 
@@ -96,14 +90,11 @@ export const Classroom: React.FC<ClassroomProps> = ({ classroom }) => {
         </mesh>
       </group>
 
-      {/* Tables et chaises - Rangée 1 */}
       <group position={[0, 0, -0.5]}>
-        {/* Table 1 */}
         <mesh position={[-1, 0.4, 0]} castShadow receiveShadow>
           <boxGeometry args={[1.2, 0.05, 0.6]} />
           <meshStandardMaterial color={tableColor} roughness={0.3} metalness={0.1} />
         </mesh>
-        {/* Pieds de table 1 */}
         {[[-0.5, -0.5], [0.5, -0.5], [-0.5, 0.5], [0.5, 0.5]].map((pos, i) => (
           <mesh key={`table1-leg-${i}`} position={[-1 + pos[0] * 0.8, 0.2, pos[1] * 0.4]} castShadow>
             <cylinderGeometry args={[0.02, 0.02, 0.4]} />
@@ -111,23 +102,19 @@ export const Classroom: React.FC<ClassroomProps> = ({ classroom }) => {
           </mesh>
         ))}
         
-        {/* Chaise table 1 - siège */}
         <mesh position={[-1, 0.2, 0.5]} castShadow receiveShadow>
           <boxGeometry args={[0.3, 0.05, 0.3]} />
           <meshStandardMaterial color={chairColor} roughness={0.6} />
         </mesh>
-        {/* Chaise table 1 - dossier */}
         <mesh position={[-1, 0.45, 0.65]} castShadow>
           <boxGeometry args={[0.3, 0.4, 0.05]} />
           <meshStandardMaterial color={chairColor} roughness={0.6} />
         </mesh>
 
-        {/* Table 2 */}
         <mesh position={[1, 0.4, 0]} castShadow receiveShadow>
           <boxGeometry args={[1.2, 0.05, 0.6]} />
           <meshStandardMaterial color={tableColor} roughness={0.3} metalness={0.1} />
         </mesh>
-        {/* Pieds de table 2 */}
         {[[-0.5, -0.5], [0.5, -0.5], [-0.5, 0.5], [0.5, 0.5]].map((pos, i) => (
           <mesh key={`table2-leg-${i}`} position={[1 + pos[0] * 0.8, 0.2, pos[1] * 0.4]} castShadow>
             <cylinderGeometry args={[0.02, 0.02, 0.4]} />
@@ -135,26 +122,21 @@ export const Classroom: React.FC<ClassroomProps> = ({ classroom }) => {
           </mesh>
         ))}
         
-        {/* Chaise table 2 - siège */}
         <mesh position={[1, 0.2, 0.5]} castShadow receiveShadow>
           <boxGeometry args={[0.3, 0.05, 0.3]} />
           <meshStandardMaterial color={chairColor} roughness={0.6} />
         </mesh>
-        {/* Chaise table 2 - dossier */}
         <mesh position={[1, 0.45, 0.65]} castShadow>
           <boxGeometry args={[0.3, 0.4, 0.05]} />
           <meshStandardMaterial color={chairColor} roughness={0.6} />
         </mesh>
       </group>
 
-      {/* Tables et chaises - Rangée 2 */}
       <group position={[0, 0, 0.8]}>
-        {/* Table 3 */}
         <mesh position={[-1, 0.4, 0]} castShadow receiveShadow>
           <boxGeometry args={[1.2, 0.05, 0.6]} />
           <meshStandardMaterial color={tableColor} roughness={0.3} metalness={0.1} />
         </mesh>
-        {/* Pieds de table 3 */}
         {[[-0.5, -0.5], [0.5, -0.5], [-0.5, 0.5], [0.5, 0.5]].map((pos, i) => (
           <mesh key={`table3-leg-${i}`} position={[-1 + pos[0] * 0.8, 0.2, pos[1] * 0.4]} castShadow>
             <cylinderGeometry args={[0.02, 0.02, 0.4]} />
@@ -162,23 +144,19 @@ export const Classroom: React.FC<ClassroomProps> = ({ classroom }) => {
           </mesh>
         ))}
         
-        {/* Chaise table 3 - siège */}
         <mesh position={[-1, 0.2, -0.5]} castShadow receiveShadow>
           <boxGeometry args={[0.3, 0.05, 0.3]} />
           <meshStandardMaterial color={chairColor} roughness={0.6} />
         </mesh>
-        {/* Chaise table 3 - dossier */}
         <mesh position={[-1, 0.45, -0.65]} castShadow>
           <boxGeometry args={[0.3, 0.4, 0.05]} />
           <meshStandardMaterial color={chairColor} roughness={0.6} />
         </mesh>
 
-        {/* Table 4 */}
         <mesh position={[1, 0.4, 0]} castShadow receiveShadow>
           <boxGeometry args={[1.2, 0.05, 0.6]} />
           <meshStandardMaterial color={tableColor} roughness={0.3} metalness={0.1} />
         </mesh>
-        {/* Pieds de table 4 */}
         {[[-0.5, -0.5], [0.5, -0.5], [-0.5, 0.5], [0.5, 0.5]].map((pos, i) => (
           <mesh key={`table4-leg-${i}`} position={[1 + pos[0] * 0.8, 0.2, pos[1] * 0.4]} castShadow>
             <cylinderGeometry args={[0.02, 0.02, 0.4]} />
@@ -186,25 +164,21 @@ export const Classroom: React.FC<ClassroomProps> = ({ classroom }) => {
           </mesh>
         ))}
         
-        {/* Chaise table 4 - siège */}
         <mesh position={[1, 0.2, -0.5]} castShadow receiveShadow>
           <boxGeometry args={[0.3, 0.05, 0.3]} />
           <meshStandardMaterial color={chairColor} roughness={0.6} />
         </mesh>
-        {/* Chaise table 4 - dossier */}
         <mesh position={[1, 0.45, -0.65]} castShadow>
           <boxGeometry args={[0.3, 0.4, 0.05]} />
           <meshStandardMaterial color={chairColor} roughness={0.6} />
         </mesh>
       </group>
 
-      {/* Bureau du professeur */}
       <group position={[0, 0, -1.2]}>
         <mesh position={[0, 0.5, 0]} castShadow receiveShadow>
           <boxGeometry args={[1.5, 0.08, 0.8]} />
           <meshStandardMaterial color="#92400E" roughness={0.4} metalness={0.2} />
         </mesh>
-        {/* Pieds du bureau */}
         {[[-0.6, -0.3], [0.6, -0.3], [-0.6, 0.3], [0.6, 0.3]].map((pos, i) => (
           <mesh key={`desk-leg-${i}`} position={[pos[0], 0.25, pos[1]]} castShadow>
             <cylinderGeometry args={[0.03, 0.03, 0.5]} />
@@ -213,9 +187,7 @@ export const Classroom: React.FC<ClassroomProps> = ({ classroom }) => {
         ))}
       </group>
 
-      {/* Lettre d'identification flottante */}
       <group ref={letterRef} position={[0, 2.5, 0]}>
-        {/* Cercle de fond pour la lettre */}
         <mesh position={[0, 0, -0.1]}>
           <circleGeometry args={[0.6]} />
           <meshStandardMaterial 
@@ -235,7 +207,6 @@ export const Classroom: React.FC<ClassroomProps> = ({ classroom }) => {
         </Text>
       </group>
 
-      {/* Indicateur d'état */}
       <mesh position={[0, 3.2, 0]}>
         <sphereGeometry args={[0.15]} />
         <meshStandardMaterial
